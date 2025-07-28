@@ -11,6 +11,10 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     name VARCHAR(100) NOT NULL,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    enabled BOOLEAN DEFAULT TRUE,
+    active BOOLEAN DEFAULT TRUE,
     avatar_url TEXT,
     email_verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -28,7 +32,9 @@ CREATE TABLE IF NOT EXISTS categories (
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(50) NOT NULL,
     color VARCHAR(7) DEFAULT '#3B82F6',
+    description VARCHAR(200),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, name)
 );
 
@@ -71,7 +77,9 @@ CREATE TABLE IF NOT EXISTS tags (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     name VARCHAR(30) NOT NULL,
+    color VARCHAR(7) DEFAULT '#6B7280',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, name)
 );
 
@@ -100,6 +108,11 @@ CREATE TABLE IF NOT EXISTS user_settings (
     language VARCHAR(5) DEFAULT 'en',
     date_format VARCHAR(20) DEFAULT 'MM/DD/YYYY',
     time_format VARCHAR(5) DEFAULT '12h',
+    email_notifications BOOLEAN DEFAULT TRUE,
+    push_notifications BOOLEAN DEFAULT TRUE,
+    task_reminders BOOLEAN DEFAULT TRUE,
+    daily_digest BOOLEAN DEFAULT FALSE,
+    weekly_report BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -156,6 +169,12 @@ $$ language 'plpgsql';
 
 -- Add updated_at triggers to relevant tables
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_categories_updated_at BEFORE UPDATE ON categories
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_tags_updated_at BEFORE UPDATE ON tags
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks

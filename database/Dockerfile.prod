@@ -23,9 +23,6 @@ EXPOSE 5432
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
   CMD pg_isready -U $POSTGRES_USER -d $POSTGRES_DB || exit 1
 
-# Add production user for better security (optional)
-# RUN addgroup -g 999 postgres && adduser -D -s /bin/sh -u 999 -G postgres postgres
-
 # Production labels for monitoring and management
 LABEL maintainer="TodoApp Team"
 LABEL version="1.0"

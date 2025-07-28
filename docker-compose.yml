@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Database service with custom initialization
   database:
@@ -35,23 +33,28 @@ services:
   #   networks:
   #     - todo-network
 
-  # Backend service (placeholder - will be implemented later)
-  # backend:
-  #   build: ./backend
-  #   container_name: todoapp-backend
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     - SPRING_PROFILES_ACTIVE=docker
-  #     - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/tododb
-  #     - SPRING_DATASOURCE_USERNAME=todouser
-  #     - SPRING_DATASOURCE_PASSWORD=todopass
-  #     - JWT_SECRET=${JWT_SECRET:-defaultSecretForDev}
-  #   depends_on:
-  #     database:
-  #       condition: service_healthy
-  #   networks:
-  #     - todo-network
+  # Backend service
+  backend:
+    build: ./backend
+    container_name: todoapp-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/tododb
+      - SPRING_DATASOURCE_USERNAME=todouser
+      - SPRING_DATASOURCE_PASSWORD=todopass
+      - JWT_SECRET=${JWT_SECRET:-defaultSecretForDev}
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - todo-network
 
 volumes:
   postgres_data:

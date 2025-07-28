@@ -5,7 +5,7 @@ A sleek, modern TODO web application built with **React**, **Spring Boot**, and 
 ![Project Status](https://img.shields.io/badge/Status-In%20Development-yellow)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![Frontend](https://img.shields.io/badge/Frontend-React%2018%2B-61dafb)
-![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203.x-6db33f)
+![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203.1.5-6db33f)
 ![Database](https://img.shields.io/badge/Database-PostgreSQL%2015-336791)
 ![Deployment](https://img.shields.io/badge/Deployment-AWS%20EKS-ff9900)
 
@@ -53,9 +53,9 @@ graph TB
 
 ### Technology Stack
 - **Frontend**: React 18+ with TypeScript, Redux Toolkit, Material-UI
-- **Backend**: Spring Boot 3.x with Java 21, Spring Security, Spring Data JPA
+- **Backend**: Spring Boot 3.1.5 with Java 21, Spring Security, Spring Data JPA
 - **Database**: PostgreSQL 15+ with environment-specific Docker containers
-- **Container**: Docker with separate development and production images
+- **Container**: Docker/Podman with separate development and production images
 - **Deployment**: AWS EKS with auto-scaling and load balancing
 - **Development**: Podman Desktop with hot-reload and sample data support
 
@@ -73,16 +73,17 @@ graph TB
 git clone https://github.com/your-username/todo-app.git
 cd todo-app
 
-# Start all services with Podman Desktop (development setup)
-podman-compose up --build
-
-# Or with Docker Compose (includes sample data for development)
+# Start all services with Docker Compose (development setup)
 docker-compose up --build
+
+# Or with Podman Desktop (includes sample data for development)
+podman compose up --build
 ```
 
 ### 2. Access the Application
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8080/api
+- **API Documentation**: http://localhost:8080/swagger-ui.html
 - **Database**: localhost:5432 (tododb/todouser/todopass)
 
 ### 3. Demo Account
@@ -101,10 +102,10 @@ npm run dev  # Runs on http://localhost:5173
 
 # Backend development with hot reload
 cd backend
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+./gradlew bootRun
 
 # Database only (development with sample data)
-podman-compose up database
+docker-compose up database
 # Note: Uses Dockerfile with demo users and sample tasks
 ```
 
@@ -126,7 +127,8 @@ todo-app/
 ├── backend/               # Spring Boot application
 │   ├── src/main/java/    # Java source code
 │   ├── src/test/         # Test classes
-│   └── Dockerfile        # Backend container build
+│   ├── Dockerfile        # Development container build
+│   └── Dockerfile.prod   # Production container build
 ├── database/              # PostgreSQL setup with environment-specific configs
 │   ├── db/init/          # Schema initialization scripts
 │   ├── Dockerfile        # Development container (with sample data)
@@ -145,10 +147,11 @@ todo-app/
 - **[Technical Architecture](docs/technical-architecture.md)** - System design, API specs, and deployment guide
 - **[UI Mockups](docs/ui-mockups.md)** - Complete design system and visual mockups
 - **[Database Setup Guide](database/README.md)** - Comprehensive database setup for development and production
+- **[Backend Documentation](backend/README.md)** - Spring Boot application setup and API documentation
 
 ### API Documentation
 - **Development**: http://localhost:8080/swagger-ui.html
-- **Production**: https://your-app.com/api/docs
+- **Production**: https://your-app.com/swagger-ui.html
 
 ## 🧪 Testing
 
@@ -163,8 +166,8 @@ npm run lint          # ESLint and Prettier
 ### Backend Testing
 ```bash
 cd backend
-./mvnw test           # Unit and integration tests
-./mvnw verify         # Full test suite with coverage
+./gradlew test           # Unit and integration tests
+./gradlew verify         # Full test suite with coverage
 ```
 
 ### Database Testing
@@ -186,7 +189,7 @@ kubectl apply -f k8s/manifests/
 ```
 
 ### Environment Configuration
-- **Development**: Local Podman/Docker setup with sample data
+- **Development**: Local Docker/Podman setup with sample data
 - **Staging**: AWS EKS with clean database (no sample data)
 - **Production**: AWS EKS with RDS PostgreSQL or containerized production database
 

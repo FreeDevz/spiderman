@@ -162,7 +162,7 @@ docker tag todoapp-database-prod:latest 123456789012.dkr.ecr.us-west-2.amazonaws
 docker push 123456789012.dkr.ecr.us-west-2.amazonaws.com/todoapp-database:latest
 ```
 
-### Step 4: Create Kubernetes Manifests
+### Step 3: Create Kubernetes Manifests
 
 Create `k8s/database/` directory with the following manifests:
 
@@ -282,7 +282,7 @@ spec:
   type: ClusterIP
 ```
 
-### Step 5: Deploy to EKS
+### Step 4: Deploy to EKS
 
 ```bash
 # Create namespace
@@ -303,7 +303,7 @@ kubectl logs -n todoapp -l app=database
 kubectl exec -n todoapp -it deployment/database -- psql -U todouser -d tododb -c "\dt"
 ```
 
-### Step 6: Verify Production Deployment
+### Step 5: Verify Production Deployment
 
 ```bash
 # Port forward to test connection
@@ -589,4 +589,4 @@ database/
 
 **Database Version**: PostgreSQL 15.13  
 **Container Base**: alpine:latest  
-**Last Updated**: 2024-07-28 
+**Last Updated**: 2024-12-19 

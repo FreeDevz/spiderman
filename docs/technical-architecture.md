@@ -1313,7 +1313,7 @@ Frontend ↔ API Gateway ↔ [Auth Service, Task Service, Notification Service] 
 - **Consistent Development**: Same environment across all developer machines and production
 - **Easy Scaling**: Each service can be scaled independently
 - **Database Versioning**: Schema changes tracked in Git with initialization scripts
-- **One-Command Setup**: `podman-compose up` or `docker-compose up` starts entire application stack
+- **One-Command Setup**: `podman compose up` or `docker compose up` starts entire application stack
 
 #### Local Development (Podman Desktop)
 ```
@@ -1366,14 +1366,14 @@ The **same Docker images** built locally with Podman will run identically in AWS
 git clone <repository-url>
 cd todo-app
 
-# Option 1: Using podman-compose (if installed)
-podman-compose up --build
+# Option 1: Using podman compose (if installed)
+podman compose up --build
 
 # Option 2: Using Docker Compose with Podman (most common)
-docker-compose up --build
+docker compose up --build
 
 # Option 3: Using Podman directly
-podman-compose up --build
+podman compose up --build
 
 # Access the application
 # Frontend: http://localhost:3000
@@ -1390,16 +1390,16 @@ podman ps
 podman logs todo-app-backend-1
 
 # Stop all services
-podman-compose down
+podman compose down
 
 # Rebuild specific service
-podman-compose up --build backend
+podman compose up --build backend
 
 # Connect to database container
 podman exec -it todo-app-database-1 psql -U todouser -d tododb
 
 # Clean up volumes (reset database)
-podman-compose down -v
+podman compose down -v
 podman volume prune
 ```
 
@@ -1421,10 +1421,10 @@ cd backend
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 
 # Database: Use containerized version
-podman-compose up database
+podman compose up database
 
 # Full development stack with hot reload
-podman-compose up database  # Start only database
+podman compose up database  # Start only database
 # Then run frontend and backend with their dev servers
 ```
 
@@ -1441,7 +1441,7 @@ podman network ls
 podman network inspect todo-app_todo-network
 
 # Reset everything to clean state
-podman-compose down -v
+podman compose down -v
 podman system prune -a
 podman volume prune
 ```
@@ -1474,17 +1474,17 @@ services:
 ### 12.3 Database Management
 ```bash
 # Connect to database container
-docker-compose exec database psql -U todouser -d tododb
+docker compose exec database psql -U todouser -d tododb
 
 # View database logs
-docker-compose logs database
+docker compose logs database
 
 # Backup database
-docker-compose exec database pg_dump -U todouser tododb > backup.sql
+docker compose exec database pg_dump -U todouser tododb > backup.sql
 
 # Reset database (recreate with fresh schema)
-docker-compose down -v
-docker-compose up database
+docker compose down -v
+docker compose up database
 ```
 
 ### 12.4 AWS EKS Production Deployment
