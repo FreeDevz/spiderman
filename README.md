@@ -54,10 +54,10 @@ graph TB
 ### Technology Stack
 - **Frontend**: React 18+ with TypeScript, Redux Toolkit, Material-UI
 - **Backend**: Spring Boot 3.x with Java 17, Spring Security, Spring Data JPA
-- **Database**: PostgreSQL 15+ with custom initialization scripts
-- **Container**: Docker with multi-stage builds for all services
+- **Database**: PostgreSQL 15+ with environment-specific Docker containers
+- **Container**: Docker with separate development and production images
 - **Deployment**: AWS EKS with auto-scaling and load balancing
-- **Development**: Podman Desktop with hot-reload support
+- **Development**: Podman Desktop with hot-reload and sample data support
 
 ## 🚀 Quick Start
 
@@ -73,10 +73,10 @@ graph TB
 git clone https://github.com/your-username/todo-app.git
 cd todo-app
 
-# Start all services with Podman Desktop
+# Start all services with Podman Desktop (development setup)
 podman-compose up --build
 
-# Or with Docker Compose
+# Or with Docker Compose (includes sample data for development)
 docker-compose up --build
 ```
 
@@ -103,15 +103,17 @@ npm run dev  # Runs on http://localhost:5173
 cd backend
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 
-# Database only (containerized)
+# Database only (development with sample data)
 podman-compose up database
+# Note: Uses Dockerfile with demo users and sample tasks
 ```
 
 ### Development Tools
 - **Hot Reload**: Both React (Vite) and Spring Boot (DevTools)
 - **Debug Support**: Java remote debugging on port 5005
-- **Database GUI**: Connect with any PostgreSQL client
+- **Database GUI**: Connect with any PostgreSQL client (includes sample data)
 - **API Testing**: Swagger UI available at http://localhost:8080/swagger-ui.html
+- **Database Setup**: Separate development and production Docker configurations
 
 ### Project Structure
 ```
@@ -125,11 +127,14 @@ todo-app/
 │   ├── src/main/java/    # Java source code
 │   ├── src/test/         # Test classes
 │   └── Dockerfile        # Backend container build
-├── database/              # PostgreSQL setup
+├── database/              # PostgreSQL setup with environment-specific configs
 │   ├── db/init/          # Schema initialization scripts
-│   └── Dockerfile        # Database container build
+│   ├── Dockerfile        # Development container (with sample data)
+│   ├── Dockerfile.prod   # Production container (clean database)
+│   ├── postgresql.prod.conf # Production-optimized PostgreSQL config
+│   └── README.md         # Database setup guide
 ├── k8s/                   # Kubernetes manifests for EKS
-├── docs/                  # Project documentation
+├── docs/                  # Complete project documentation
 └── docker-compose.yml    # Local development orchestration
 ```
 
@@ -139,6 +144,7 @@ todo-app/
 - **[Functional Requirements](docs/functional-requirements.md)** - Feature specifications and user stories
 - **[Technical Architecture](docs/technical-architecture.md)** - System design, API specs, and deployment guide
 - **[UI Mockups](docs/ui-mockups.md)** - Complete design system and visual mockups
+- **[Database Setup Guide](database/README.md)** - Comprehensive database setup for development and production
 
 ### API Documentation
 - **Development**: http://localhost:8080/swagger-ui.html
@@ -163,13 +169,15 @@ cd backend
 
 ### Database Testing
 - **Testcontainers** integration for isolated database testing
-- **Sample data** automatically loaded for development
+- **Development container** with sample data automatically loaded
+- **Production container** testing with clean database schema
+- **Environment isolation** with separate Docker configurations
 
 ## 🚀 Deployment
 
 ### Production Deployment (AWS EKS)
 ```bash
-# Build and push to ECR
+# Build production images (uses Dockerfile.prod for database)
 ./scripts/deploy-to-aws.sh
 
 # Or deploy manually
@@ -178,9 +186,14 @@ kubectl apply -f k8s/manifests/
 ```
 
 ### Environment Configuration
-- **Development**: Local Podman/Docker setup
-- **Staging**: AWS EKS with development database
-- **Production**: AWS EKS with RDS PostgreSQL
+- **Development**: Local Podman/Docker setup with sample data
+- **Staging**: AWS EKS with clean database (no sample data)
+- **Production**: AWS EKS with RDS PostgreSQL or containerized production database
+
+### Database Deployment Options
+- **Development**: `Dockerfile` - includes sample data and demo users
+- **Production**: `Dockerfile.prod` - clean database with optimized configuration
+- **Staging/Production**: Can also use managed AWS RDS PostgreSQL
 
 ## 🤝 Contributing
 
