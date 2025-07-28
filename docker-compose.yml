@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # Database service with custom initialization
+  database:
+    build: ./database
+    container_name: todoapp-database
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=tododb
+      - POSTGRES_USER=todouser
+      - POSTGRES_PASSWORD=todopass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/backup:/backup
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todouser -d tododb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - todo-network
+
+  # Frontend service (placeholder - will be implemented later)
+  # frontend:
+  #   build: ./frontend
+  #   container_name: todoapp-frontend
+  #   ports:
+  #     - "3000:80"
+  #   environment:
+  #     - REACT_APP_API_URL=http://localhost:8080/api
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - todo-network
+
+  # Backend service (placeholder - will be implemented later)
+  # backend:
+  #   build: ./backend
+  #   container_name: todoapp-backend
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #     - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/tododb
+  #     - SPRING_DATASOURCE_USERNAME=todouser
+  #     - SPRING_DATASOURCE_PASSWORD=todopass
+  #     - JWT_SECRET=${JWT_SECRET:-defaultSecretForDev}
+  #   depends_on:
+  #     database:
+  #       condition: service_healthy
+  #   networks:
+  #     - todo-network
+
+volumes:
+  postgres_data:
+    # Podman note: Volumes work identically to Docker
+    driver: local
+
+networks:
+  todo-network:
+    driver: bridge
+    # Podman note: Bridge networking works seamlessly
+
+# Podman-specific optimizations (optional)
+# Add to .env file for Podman Desktop:
+# COMPOSE_PROJECT_NAME=todo-app
+# PODMAN_USERNS=keep-id  # For better file permissions on Linux 
