@@ -53,7 +53,7 @@ graph TB
 
 ### Technology Stack
 - **Frontend**: React 18+ with TypeScript, Redux Toolkit, Material-UI
-- **Backend**: Spring Boot 3.x with Java 17, Spring Security, Spring Data JPA
+- **Backend**: Spring Boot 3.x with Java 21, Spring Security, Spring Data JPA
 - **Database**: PostgreSQL 15+ with environment-specific Docker containers
 - **Container**: Docker with separate development and production images
 - **Deployment**: AWS EKS with auto-scaling and load balancing
@@ -65,7 +65,7 @@ graph TB
 - **Podman Desktop** or Docker installed
 - **Git** for version control
 - **Node.js 18+** (for local frontend development)
-- **Java 17+** (for local backend development)
+- **Java 21+** (for local backend development)
 
 ### 1. Clone and Start
 ```bash

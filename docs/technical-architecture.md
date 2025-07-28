@@ -23,7 +23,7 @@
         ▼                       ▼                       ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │  Docker Image   │    │  Docker Image   │    │  Docker Image   │
-│  (nginx:alpine) │    │ (openjdk:17)    │    │(postgres:15+sql)│
+│  (nginx:alpine) │    │ (openjdk:21)    │    │(postgres:15+sql)│
 │                 │    │                 │    │                 │
 │  AWS EKS Deploy │    │  AWS EKS Deploy │    │  AWS Deployment │
 │  - EKS Pods     │    │  - EKS Pods     │    │  - RDS PostSQL  │
@@ -54,7 +54,7 @@
 
 ### 2.2 Backend Stack
 **Primary Choice: Java/Spring Boot**
-- **Language**: Java 17+ LTS
+- **Language**: Java 21+ LTS
 - **Framework**: Spring Boot 3.x
 - **Security**: Spring Security + JWT
 - **Database ORM**: Spring Data JPA (Hibernate)
@@ -764,7 +764,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
       
@@ -935,7 +935,7 @@ CMD ["nginx", "-g", "daemon off;"]
 #### Backend Dockerfile
 ```dockerfile
 # Multi-stage build for Spring Boot backend
-FROM openjdk:17-jdk-slim as builder
+FROM openjdk:21-jdk-slim as builder
 
 WORKDIR /app
 COPY mvnw .
@@ -947,7 +947,7 @@ COPY src ./src
 RUN ./mvnw clean package -DskipTests
 
 # Production stage
-FROM openjdk:17-jre-slim
+FROM openjdk:21-jre-slim
 
 RUN addgroup --system spring && adduser --system spring --ingroup spring
 USER spring:spring
