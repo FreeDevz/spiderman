@@ -18,7 +18,8 @@ The TodoApp database is built on **PostgreSQL 15-alpine** with:
 - **7 core tables** with proper relationships and constraints
 - **48 optimized indexes** for query performance
 - **Automated triggers** for timestamp management
-- **Sample data** for development (optional)
+- **Separate Dockerfiles** for development and production environments
+- **Sample data** for development (excluded in production)
 - **Health checks** and monitoring support
 
 ## 🛠️ **Local Development Setup**
@@ -34,8 +35,9 @@ The TodoApp database is built on **PostgreSQL 15-alpine** with:
 # Navigate to database directory
 cd database/
 
-# Build the container with sample data
+# Build the development container with sample data
 podman build -t todoapp-database .
+# Note: This uses the default Dockerfile which includes sample data
 
 # Run the database container
 podman run -d \
@@ -138,72 +140,13 @@ podman exec todoapp-db psql -U todouser -d tododb -c "SELECT name, email FROM us
 
 ### Step 1: Build Production Image
 
-Create a production Dockerfile without sample data:
+The production environment uses a separate Dockerfile (`Dockerfile.prod`) that:
+- **Excludes sample data** (no `03_sample_data.sql`)
+- **Includes production configuration** (`postgresql.prod.conf`)
+- **Has optimized health checks** for production monitoring
+- **Contains production labels** for container management
 
-```bash
-# Create production Dockerfile
-cat > Dockerfile.prod << 'EOF'
-# Production PostgreSQL image without sample data
-FROM postgres:15-alpine
-
-# Set environment variables (override in deployment)
-ENV POSTGRES_DB=tododb
-ENV POSTGRES_USER=todouser
-
-# Copy only schema and indexes (no sample data)
-COPY ./db/init/01_create_schema.sql /docker-entrypoint-initdb.d/
-COPY ./db/init/02_create_indexes.sql /docker-entrypoint-initdb.d/
-
-# Make scripts executable
-RUN chmod +x /docker-entrypoint-initdb.d/*.sql
-
-# Expose PostgreSQL port
-EXPOSE 5432
-
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD pg_isready -U $POSTGRES_USER -d $POSTGRES_DB || exit 1
-
-# Production optimizations
-COPY postgresql.conf /etc/postgresql/postgresql.conf
-EOF
-```
-
-### Step 2: Create Production PostgreSQL Configuration
-
-```bash
-# Create optimized postgresql.conf for production
-cat > postgresql.conf << 'EOF'
-# PostgreSQL Production Configuration for TodoApp
-
-# Connection Settings
-max_connections = 100
-shared_buffers = 256MB
-effective_cache_size = 1GB
-
-# Write-Ahead Logging
-wal_level = replica
-max_wal_size = 1GB
-min_wal_size = 80MB
-
-# Query Planner
-random_page_cost = 1.1
-effective_io_concurrency = 200
-
-# Logging
-log_min_duration_statement = 1000
-log_checkpoints = on
-log_connections = on
-log_disconnections = on
-log_lock_waits = on
-
-# Performance
-checkpoint_completion_target = 0.9
-default_statistics_target = 100
-EOF
-```
-
-### Step 3: Build and Push to AWS ECR
+### Step 2: Build and Push to AWS ECR
 
 ```bash
 # Get ECR login token
@@ -615,6 +558,32 @@ For issues or questions:
 2. Review container logs: `podman logs todoapp-db`
 3. Verify database connection and schema
 4. Create an issue in the project repository
+
+## 📁 **File Structure**
+
+```
+database/
+├── README.md                    # This comprehensive setup guide
+├── Dockerfile                   # Development container with sample data
+├── Dockerfile.prod              # Production container without sample data
+├── postgresql.prod.conf         # Production PostgreSQL configuration
+├── db/
+│   ├── init/
+│   │   ├── 01_create_schema.sql # Database schema and tables
+│   │   ├── 02_create_indexes.sql # Performance optimization indexes
+│   │   └── 03_sample_data.sql   # Development sample data (excluded in prod)
+│   └── sample-data/            # Additional sample files directory
+└── backup/                     # Backup files location
+```
+
+### Environment-Specific Files
+
+| File | Development | Production | Purpose |
+|------|-------------|------------|---------|
+| `Dockerfile` | ✅ Used | ❌ Not used | Includes sample data for development |
+| `Dockerfile.prod` | ❌ Not used | ✅ Used | Clean production image |
+| `postgresql.prod.conf` | ❌ Not used | ✅ Used | Production-optimized configuration |
+| `03_sample_data.sql` | ✅ Included | ❌ Excluded | Sample data for testing |
 
 ---
 

@@ -1,4 +1,5 @@
-# Custom PostgreSQL image with schema initialization
+# Development PostgreSQL image for TodoApp
+# This image includes sample data for local development and testing
 FROM postgres:15-alpine
 
 # Set environment variables
@@ -18,9 +19,12 @@ RUN chmod +x /docker-entrypoint-initdb.d/*.sql
 # Expose PostgreSQL port
 EXPOSE 5432
 
-# Add healthcheck
+# Add healthcheck (faster for development)
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
   CMD pg_isready -U todouser -d tododb || exit 1
 
-# Optional: Add custom postgresql.conf for performance tuning
-# COPY postgresql.conf /etc/postgresql/postgresql.conf 
+# Development labels for identification
+LABEL maintainer="TodoApp Team"
+LABEL version="1.0"
+LABEL environment="development"
+LABEL description="TodoApp PostgreSQL database with sample data for development" 

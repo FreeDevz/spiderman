@@ -1,0 +1,33 @@
+# Production PostgreSQL image for TodoApp
+# This image is optimized for production deployment without sample data
+FROM postgres:15-alpine
+
+# Set environment variables (will be overridden in deployment)
+ENV POSTGRES_DB=tododb
+ENV POSTGRES_USER=todouser
+
+# Copy only schema and indexes (NO sample data for production)
+COPY ./db/init/01_create_schema.sql /docker-entrypoint-initdb.d/
+COPY ./db/init/02_create_indexes.sql /docker-entrypoint-initdb.d/
+
+# Copy production PostgreSQL configuration
+COPY ./postgresql.prod.conf /etc/postgresql/postgresql.conf
+
+# Make scripts executable
+RUN chmod +x /docker-entrypoint-initdb.d/*.sql
+
+# Expose PostgreSQL port
+EXPOSE 5432
+
+# Production healthcheck with longer intervals
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD pg_isready -U $POSTGRES_USER -d $POSTGRES_DB || exit 1
+
+# Add production user for better security (optional)
+# RUN addgroup -g 999 postgres && adduser -D -s /bin/sh -u 999 -G postgres postgres
+
+# Production labels for monitoring and management
+LABEL maintainer="TodoApp Team"
+LABEL version="1.0"
+LABEL environment="production"
+LABEL description="TodoApp PostgreSQL database for production deployment" 
