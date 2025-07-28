@@ -1,5 +1,6 @@
 package com.todoapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -8,6 +9,7 @@ import java.util.Map;
 /**
  * DTO for notification settings data transfer.
  */
+@Schema(description = "Notification settings data transfer object")
 public class NotificationSettingsDTO {
     
     @NotNull(message = "Notifications enabled status is required")

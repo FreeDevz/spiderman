@@ -1,5 +1,6 @@
 package com.todoapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -8,32 +9,45 @@ import java.time.LocalDateTime;
 /**
  * DTO for UserSettings data transfer in API responses.
  */
+@Schema(description = "User settings data transfer object")
 public class UserSettingsDTO {
     
+    @Schema(description = "Unique identifier for user settings")
     private Long id;
     
+    @Schema(description = "User interface theme", allowableValues = {"LIGHT", "DARK", "AUTO"}, example = "LIGHT")
     @NotNull(message = "Theme is required")
     private String theme; // LIGHT, DARK, AUTO
     
+    @Schema(description = "Whether notifications are enabled", example = "true")
     @NotNull(message = "Notifications enabled status is required")
     private Boolean notificationsEnabled;
     
+    @Schema(description = "User timezone", example = "UTC")
     @Size(max = 50, message = "Timezone must not exceed 50 characters")
     private String timeZone;
     
+    @Schema(description = "User language preference", example = "en")
     @Size(max = 5, message = "Language must not exceed 5 characters")
     private String language;
     
+    @Schema(description = "Date format preference", example = "MM/dd/yyyy")
     @Size(max = 20, message = "Date format must not exceed 20 characters")
     private String dateFormat;
     
+    @Schema(description = "Time format preference", example = "12h")
     @Size(max = 5, message = "Time format must not exceed 5 characters")
     private String timeFormat;
     
+    @Schema(description = "Email notifications enabled", example = "true")
     private Boolean emailNotifications;
+    @Schema(description = "Push notifications enabled", example = "true")
     private Boolean pushNotifications;
+    @Schema(description = "Task reminders enabled", example = "true")
     private Boolean taskReminders;
+    @Schema(description = "Daily digest enabled", example = "false")
     private Boolean dailyDigest;
+    @Schema(description = "Weekly report enabled", example = "true")
     private Boolean weeklyReport;
     
     private LocalDateTime createdAt;

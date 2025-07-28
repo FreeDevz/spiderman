@@ -1,5 +1,6 @@
 package com.todoapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 /**
  * DTO for Notification data transfer in API responses.
  */
+@Schema(description = "Notification data transfer object")
 public class NotificationDTO {
     
     private Long id;

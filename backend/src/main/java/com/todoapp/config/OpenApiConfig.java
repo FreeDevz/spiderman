@@ -8,6 +8,8 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,8 @@ import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(OpenApiConfig.class);
 
     @Value("${app.name:TodoApp}")
     private String appName;
@@ -28,12 +32,16 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        return new OpenAPI()
+        logger.info("Initializing OpenAPI configuration for {} v{}", appName, appVersion);
+        
+        OpenAPI openAPI = new OpenAPI()
                 .info(apiInfo())
                 .servers(servers())
                 .components(components())
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-                .addSecurityItem(new SecurityRequirement().addList("Basic Authentication"));
+                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"));
+        
+        logger.info("OpenAPI configuration initialized successfully");
+        return openAPI;
     }
 
     private Info apiInfo() {
@@ -87,8 +95,7 @@ public class OpenApiConfig {
 
     private Components components() {
         return new Components()
-                .addSecuritySchemes("Bearer Authentication", bearerAuth())
-                .addSecuritySchemes("Basic Authentication", basicAuth());
+                .addSecuritySchemes("Bearer Authentication", bearerAuth());
     }
 
     private SecurityScheme bearerAuth() {
@@ -99,10 +106,4 @@ public class OpenApiConfig {
                 .description("JWT token obtained from /api/auth/login endpoint");
     }
 
-    private SecurityScheme basicAuth() {
-        return new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("basic")
-                .description("Basic authentication for development purposes");
-    }
 } 

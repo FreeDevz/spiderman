@@ -1,5 +1,6 @@
 package com.todoapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -9,17 +10,22 @@ import java.time.LocalDateTime;
 /**
  * DTO for Category data transfer in API responses.
  */
+@Schema(description = "Category data transfer object")
 public class CategoryDTO {
     
+    @Schema(description = "Unique identifier for the category")
     private Long id;
     
+    @Schema(description = "Category name", example = "Work")
     @NotBlank(message = "Category name is required")
     @Size(max = 50, message = "Category name must not exceed 50 characters")
     private String name;
     
+    @Schema(description = "Category color in hex format", example = "#FF5733")
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Color must be a valid hex color code")
     private String color;
     
+    @Schema(description = "Category description", example = "Work-related tasks")
     @Size(max = 200, message = "Description must not exceed 200 characters")
     private String description;
     

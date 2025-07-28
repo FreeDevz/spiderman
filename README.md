@@ -12,12 +12,13 @@ A sleek, modern TODO web application built with **React**, **Spring Boot**, and 
 ## 🌟 Features
 
 ### ✨ Core Functionality
-- **User Authentication** - Secure registration, login, and password management
-- **Task Management** - Create, edit, delete, and organize tasks with priorities
+- **User Authentication** - Secure registration, login, and password management with JWT
+- **Task Management** - Create, edit, delete, and organize tasks with priorities and due dates
 - **Categories & Tags** - Flexible organization system with color-coded categories
 - **Smart Filtering** - Advanced search and filtering by status, priority, due date, and tags
 - **Dashboard Analytics** - Visual task statistics and productivity insights
 - **Due Date Management** - Set deadlines with visual overdue indicators
+- **Bulk Operations** - Edit or delete multiple tasks simultaneously
 
 ### 🎨 Modern UI/UX
 - **Responsive Design** - Seamless experience across desktop, tablet, and mobile
@@ -28,10 +29,10 @@ A sleek, modern TODO web application built with **React**, **Spring Boot**, and 
 
 ### 🚀 Advanced Features
 - **Auto-save** - Automatic saving with debounced input
-- **Bulk Operations** - Edit or delete multiple tasks simultaneously
 - **Data Export/Import** - JSON and CSV format support
 - **Email Notifications** - Configurable reminders for due dates
 - **Achievement System** - Productivity streaks and completion celebrations
+- **Health Monitoring** - Comprehensive health checks for all services
 
 ## 🏗️ Architecture
 
@@ -53,7 +54,7 @@ graph TB
 
 ### Technology Stack
 - **Frontend**: React 18+ with TypeScript, Redux Toolkit, Material-UI
-- **Backend**: Spring Boot 3.1.5 with Java 21, Spring Security, Spring Data JPA
+- **Backend**: Spring Boot 3.5.4 with Java 21, Spring Security, Spring Data JPA
 - **Database**: PostgreSQL 15+ with environment-specific Docker containers
 - **Container**: Docker/Podman with separate development and production images
 - **Deployment**: AWS EKS with auto-scaling and load balancing
@@ -85,11 +86,12 @@ podman compose up --build
 - **Backend API**: http://localhost:8080/api
 - **API Documentation**: http://localhost:8080/swagger-ui.html
 - **Database**: localhost:5432 (tododb/todouser/todopass)
+- **Health Checks**: http://localhost:8080/api/health
 
 ### 3. Demo Account
 - **Email**: demo@example.com
 - **Password**: password
-- **Pre-loaded**: Sample tasks and categories
+- **Pre-loaded**: Sample tasks, categories, and tags
 
 ## 💻 Development
 
@@ -114,6 +116,7 @@ docker-compose up database
 - **Debug Support**: Java remote debugging on port 5005
 - **Database GUI**: Connect with any PostgreSQL client (includes sample data)
 - **API Testing**: Swagger UI available at http://localhost:8080/swagger-ui.html
+- **Health Monitoring**: Comprehensive health checks for all services
 - **Database Setup**: Separate development and production Docker configurations
 
 ### Project Structure
@@ -126,6 +129,14 @@ todo-app/
 │   └── Dockerfile        # Frontend container build
 ├── backend/               # Spring Boot application
 │   ├── src/main/java/    # Java source code
+│   │   ├── config/       # Configuration classes
+│   │   ├── controller/   # REST controllers
+│   │   ├── dto/          # Data Transfer Objects
+│   │   ├── entity/       # JPA entities
+│   │   ├── repository/   # Data access layer
+│   │   ├── security/     # Security configuration
+│   │   ├── service/      # Business logic
+│   │   └── util/         # Utility classes
 │   ├── src/test/         # Test classes
 │   ├── Dockerfile        # Development container build
 │   └── Dockerfile.prod   # Production container build
@@ -148,6 +159,13 @@ todo-app/
 - **[UI Mockups](docs/ui-mockups.md)** - Complete design system and visual mockups
 - **[Database Setup Guide](database/README.md)** - Comprehensive database setup for development and production
 - **[Backend Documentation](backend/README.md)** - Spring Boot application setup and API documentation
+
+### Backend Documentation
+- **[API Documentation](backend/API_DOCUMENTATION.md)** - Complete REST API reference
+- **[Security Implementation](backend/SECURITY_README.md)** - JWT authentication and security details
+- **[Health Checks](backend/HEALTH_CHECK_README.md)** - Health monitoring and diagnostics
+- **[API Implementation Status](backend/API_IMPLEMENTATION_STATUS.md)** - Current implementation progress
+- **[Swagger Documentation](backend/SWAGGER_DOCUMENTATION_SUMMARY.md)** - OpenAPI/Swagger integration
 
 ### API Documentation
 - **Development**: http://localhost:8080/swagger-ui.html
@@ -220,9 +238,10 @@ Please use the [GitHub Issues](https://github.com/your-username/todo-app/issues)
 
 ### Phase 1: MVP (Weeks 1-4) ✅
 - [x] Project setup and documentation
-- [x] Basic authentication system
+- [x] Basic authentication system with JWT
 - [x] Core task CRUD operations
 - [x] Responsive design foundation
+- [x] Health monitoring and diagnostics
 
 ### Phase 2: Enhanced Features (Weeks 5-8)
 - [ ] Categories and tags implementation
@@ -262,6 +281,7 @@ Please use the [GitHub Issues](https://github.com/your-username/todo-app/issues)
 - **Data Protection**: Encryption in transit and at rest
 - **Compliance**: OWASP security guidelines
 - **Privacy**: GDPR-compliant data handling
+- **Health Monitoring**: Comprehensive security health checks
 
 ## 📱 Browser Support
 

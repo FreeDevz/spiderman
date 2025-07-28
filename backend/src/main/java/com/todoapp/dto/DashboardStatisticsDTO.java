@@ -1,5 +1,6 @@
 package com.todoapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 /**
  * DTO for Dashboard statistics data transfer in API responses.
  */
+@Schema(description = "Dashboard statistics data transfer object")
 public class DashboardStatisticsDTO {
     
     private long totalTasks;

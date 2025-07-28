@@ -43,19 +43,19 @@ spring:
       password: admin
       roles: ADMIN
   
-  # Mail Configuration (for email notifications)
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
+  # Mail Configuration (for email notifications) - Disabled for now
+  # mail:
+  #   host: smtp.gmail.com
+  #   port: 587
+  #   username: ${MAIL_USERNAME:}
+  #   password: ${MAIL_PASSWORD:}
+  #   properties:
+  #     mail:
+  #       smtp:
+  #         auth: true
+  #         starttls:
+  #           enable: true
+  #           required: true
   
   # Server Configuration
 server:
@@ -75,6 +75,8 @@ logging:
     org.springframework.web: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springdoc: DEBUG
+    io.swagger: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
@@ -89,6 +91,12 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+      show-components: always
+  health:
+    mail:
+      enabled: false  # Disable mail health check since we don't have mail credentials
+    defaults:
+      enabled: true
   metrics:
     export:
       prometheus:
@@ -123,11 +131,9 @@ app:
 # OpenAPI/Swagger Configuration
 springdoc:
   api-docs:
-    path: /api-docs
+    enabled: true
   swagger-ui:
-    path: /swagger-ui.html
-    operationsSorter: method
-    tagsSorter: alpha
+    enabled: true
   show-actuator: true
   
 ---
@@ -149,10 +155,10 @@ spring:
       com.todoapp: DEBUG
       org.springframework.web: DEBUG
   
-  # Development Mail (console)
-  mail:
-    host: localhost
-    port: 1025  # MailHog for testing
+  # Development Mail (console) - Disabled for now
+  # mail:
+  #   host: localhost
+  #   port: 1025  # MailHog for testing
   
   # Development CORS (more permissive)
   cors:

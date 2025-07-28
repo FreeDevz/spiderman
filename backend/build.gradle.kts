@@ -1,7 +1,7 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.1.5"
-    id("io.spring.dependency-management") version "1.1.3"
+    id("org.springframework.boot") version "3.5.4"
+    id("io.spring.dependency-management") version "1.1.4"
 }
 
 group = "com.todoapp"
@@ -29,7 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
+    // implementation("org.springframework.boot:spring-boot-starter-mail")  // Disabled for now
     
     // Database
     runtimeOnly("org.postgresql:postgresql")
@@ -41,7 +41,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
     
     // API Documentation
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
     
     // Utilities
     implementation("org.mapstruct:mapstruct:1.5.5.Final")

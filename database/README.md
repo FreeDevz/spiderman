@@ -21,6 +21,7 @@ The TodoApp database is built on **PostgreSQL 15-alpine** with:
 - **Separate Dockerfiles** for development and production environments
 - **Sample data** for development (excluded in production)
 - **Health checks** and monitoring support
+- **Comprehensive backup and recovery** procedures
 
 ## 🛠️ **Local Development Setup**
 
@@ -107,6 +108,7 @@ jane.smith@example.com  -- Another test user
 -- • 8 tags for flexible organization
 -- • 4 notifications for testing
 -- • User settings and preferences
+-- • Dashboard statistics for testing
 ```
 
 ### Development Commands
@@ -127,6 +129,9 @@ podman exec todoapp-db psql -U todouser -d tododb -c "\dt"
 
 # Check sample user data
 podman exec todoapp-db psql -U todouser -d tododb -c "SELECT name, email FROM users;"
+
+# Check health status
+podman exec todoapp-db pg_isready -U todouser -d tododb
 ```
 
 ## 🚀 **Production Deployment (AWS EKS)**
@@ -145,6 +150,7 @@ The production environment uses a separate Dockerfile (`Dockerfile.prod`) that:
 - **Includes production configuration** (`postgresql.prod.conf`)
 - **Has optimized health checks** for production monitoring
 - **Contains production labels** for container management
+- **Uses optimized PostgreSQL settings** for production workloads
 
 ### Step 2: Build and Push to AWS ECR
 
@@ -248,6 +254,8 @@ spec:
             - tododb
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           exec:
             command:
@@ -258,6 +266,8 @@ spec:
             - tododb
           initialDelaySeconds: 5
           periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
       volumes:
       - name: postgres-data
         persistentVolumeClaim:
@@ -315,6 +325,9 @@ psql -h localhost -p 5432 -U todouser -d tododb
 # Verify schema without sample data
 psql -h localhost -p 5432 -U todouser -d tododb -c "SELECT COUNT(*) FROM users;"
 # Should return 0 for production (no sample data)
+
+# Check health status
+kubectl exec -n todoapp deployment/database -- pg_isready -U todouser -d tododb
 ```
 
 ## 📊 **Database Schema**
@@ -323,13 +336,13 @@ psql -h localhost -p 5432 -U todouser -d tododb -c "SELECT COUNT(*) FROM users;"
 
 | Table | Purpose | Key Features |
 |-------|---------|--------------|
-| `users` | User accounts | Authentication, email verification |
-| `categories` | Task organization | Color coding, user-specific |
-| `tasks` | Main todo items | Status, priority, due dates |
-| `tags` | Flexible labeling | Many-to-many with tasks |
-| `task_tags` | Tag relationships | Junction table |
-| `user_settings` | User preferences | Theme, timezone, notifications |
-| `notifications` | In-app messages | Scheduled, metadata support |
+| `users` | User accounts | Authentication, email verification, password hashing |
+| `categories` | Task organization | Color coding, user-specific, soft delete |
+| `tasks` | Main todo items | Status, priority, due dates, bulk operations |
+| `tags` | Flexible labeling | Many-to-many with tasks, color coding |
+| `task_tags` | Tag relationships | Junction table with optimized indexes |
+| `user_settings` | User preferences | Theme, timezone, notifications, privacy |
+| `notifications` | In-app messages | Scheduled, metadata support, read status |
 
 ### Key Relationships
 
@@ -356,6 +369,15 @@ SELECT * FROM user_dashboard_stats WHERE user_id = 1;
 -- Returns: total_tasks, completed_tasks, pending_tasks, overdue_tasks, etc.
 ```
 
+### Indexes and Performance
+
+The database includes 48 optimized indexes for:
+- **User queries**: Email, username lookups
+- **Task filtering**: Status, priority, due date, category
+- **Tag operations**: Name-based searches
+- **Dashboard queries**: Aggregated statistics
+- **Notification delivery**: User and status filtering
+
 ## 🔧 **Environment Variables**
 
 ### Development
@@ -364,6 +386,7 @@ SELECT * FROM user_dashboard_stats WHERE user_id = 1;
 POSTGRES_DB=tododb
 POSTGRES_USER=todouser
 POSTGRES_PASSWORD=todopass
+POSTGRES_INITDB_ARGS="--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
 ```
 
 ### Production
@@ -373,6 +396,7 @@ POSTGRES_DB=tododb
 POSTGRES_USER=todouser
 POSTGRES_PASSWORD=<secure-password>
 PGDATA=/var/lib/postgresql/data
+POSTGRES_INITDB_ARGS="--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
 ```
 
 ### AWS EKS Specific
@@ -403,6 +427,9 @@ podman run -d --name todoapp-db -p 5432:5432 todoapp-database
 
 # 3. Image build failures
 podman build --no-cache -t todoapp-database .
+
+# 4. Health check failures
+podman exec todoapp-db pg_isready -U todouser -d tododb
 ```
 
 #### Connection Issues
@@ -416,6 +443,9 @@ podman exec todoapp-db netstat -tlnp | grep 5432
 
 # Test authentication
 podman exec todoapp-db psql -U todouser -d tododb -c "SELECT 1;"
+
+# Check connection from host
+psql -h localhost -p 5432 -U todouser -d tododb -c "SELECT version();"
 ```
 
 #### Sample Data Issues
@@ -426,6 +456,10 @@ podman exec todoapp-db psql -U todouser -d tododb -c "SELECT COUNT(*) FROM users
 
 # Reload sample data
 podman exec todoapp-db psql -U todouser -d tododb -f /docker-entrypoint-initdb.d/03_sample_data.sql
+
+# Check specific tables
+podman exec todoapp-db psql -U todouser -d tododb -c "SELECT COUNT(*) FROM tasks;"
+podman exec todoapp-db psql -U todouser -d tododb -c "SELECT COUNT(*) FROM categories;"
 ```
 
 ### Production Issues
@@ -443,6 +477,7 @@ kubectl logs -n todoapp -l app=database --previous
 # 1. Image pull errors - check ECR permissions
 # 2. Secret missing - verify database-secret exists
 # 3. PVC issues - check storage class and permissions
+# 4. Health check failures - verify pg_isready command
 ```
 
 #### Database Performance
@@ -456,6 +491,12 @@ kubectl exec -n todoapp -it deployment/database -- psql -U todouser -d tododb -c
 SELECT query, calls, total_time, mean_time 
 FROM pg_stat_statements 
 ORDER BY total_time DESC LIMIT 10;"
+
+# Check connection pool status
+kubectl exec -n todoapp -it deployment/database -- psql -U todouser -d tododb -c "
+SELECT count(*) as active_connections 
+FROM pg_stat_activity 
+WHERE state = 'active';"
 ```
 
 #### Connection Issues
@@ -466,6 +507,9 @@ kubectl run -it --rm debug --image=postgres:15-alpine --restart=Never -- psql -h
 
 # Check service endpoints
 kubectl get endpoints -n todoapp database-service
+
+# Test health check
+kubectl exec -n todoapp deployment/database -- pg_isready -U todouser -d tododb
 ```
 
 ## ⚙️ **Advanced Configuration**
@@ -483,6 +527,8 @@ ALTER SYSTEM SET shared_buffers = '256MB';
 ALTER SYSTEM SET effective_cache_size = '1GB';
 ALTER SYSTEM SET random_page_cost = 1.1;
 ALTER SYSTEM SET checkpoint_completion_target = 0.9;
+ALTER SYSTEM SET wal_buffers = '16MB';
+ALTER SYSTEM SET default_statistics_target = 100;
 
 -- Reload configuration
 SELECT pg_reload_conf();
@@ -496,8 +542,14 @@ SELECT pg_reload_conf();
 # Create backup
 podman exec todoapp-db pg_dump -U todouser tododb > backup-$(date +%Y%m%d).sql
 
+# Create compressed backup
+podman exec todoapp-db pg_dump -U todouser tododb | gzip > backup-$(date +%Y%m%d).sql.gz
+
 # Restore backup
 podman exec -i todoapp-db psql -U todouser -d tododb < backup-20231215.sql
+
+# Restore compressed backup
+gunzip -c backup-20231215.sql.gz | podman exec -i todoapp-db psql -U todouser -d tododb
 ```
 
 #### Production Backup (AWS EKS)
@@ -508,6 +560,9 @@ kubectl create job --from=cronjob/database-backup database-backup-manual -n todo
 
 # Manual backup
 kubectl exec -n todoapp deployment/database -- pg_dump -U todouser tododb | gzip > backup-$(date +%Y%m%d).sql.gz
+
+# Automated backup with retention
+kubectl apply -f k8s/database/backup-cronjob.yaml
 ```
 
 ### Monitoring and Metrics
@@ -522,6 +577,9 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 SELECT query, calls, total_time, mean_time 
 FROM pg_stat_statements 
 ORDER BY total_time DESC LIMIT 10;
+
+-- Reset statistics
+SELECT pg_stat_statements_reset();
 ```
 
 #### Health Checks
@@ -540,8 +598,33 @@ SELECT
   'Active Connections',
   COUNT(*)::text
 FROM pg_stat_activity 
-WHERE state = 'active';
-"
+WHERE state = 'active'
+UNION ALL
+SELECT 
+  'Cache Hit Ratio',
+  ROUND(100.0 * sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)), 2)::text || '%'
+FROM pg_statio_user_tables;"
+```
+
+#### Performance Monitoring
+
+```sql
+-- Check table sizes
+SELECT 
+  schemaname,
+  tablename,
+  pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as size
+FROM pg_tables 
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+
+-- Check index usage
+SELECT 
+  indexrelname,
+  idx_tup_read,
+  idx_tup_fetch
+FROM pg_stat_user_indexes 
+ORDER BY idx_tup_read DESC;
 ```
 
 ## 📚 **Additional Resources**
@@ -550,6 +633,7 @@ WHERE state = 'active';
 - [Kubernetes StatefulSets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
 - [AWS EKS Documentation](https://docs.aws.amazon.com/eks/)
 - [Podman Documentation](https://docs.podman.io/)
+- [PostgreSQL Performance Tuning](https://www.postgresql.org/docs/current/runtime-config-resource.html)
 
 ## 🤝 **Support**
 
@@ -557,7 +641,8 @@ For issues or questions:
 1. Check the [Troubleshooting](#troubleshooting) section
 2. Review container logs: `podman logs todoapp-db`
 3. Verify database connection and schema
-4. Create an issue in the project repository
+4. Check health status: `pg_isready -U todouser -d tododb`
+5. Create an issue in the project repository
 
 ## 📁 **File Structure**
 

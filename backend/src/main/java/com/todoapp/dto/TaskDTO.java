@@ -1,5 +1,6 @@
 package com.todoapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -9,18 +10,24 @@ import java.util.Set;
 /**
  * DTO for Task data transfer in API responses.
  */
+@Schema(description = "Task data transfer object")
 public class TaskDTO {
     
+    @Schema(description = "Unique identifier for the task")
     private Long id;
     
+    @Schema(description = "Task title", example = "Complete project documentation")
     @NotBlank(message = "Title is required")
     @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
     
+    @Schema(description = "Task description", example = "Write comprehensive documentation for the project")
     @Size(max = 500, message = "Description must not exceed 500 characters")
     private String description;
     
+    @Schema(description = "Task status", allowableValues = {"PENDING", "IN_PROGRESS", "COMPLETED", "DELETED"})
     private String status; // PENDING, COMPLETED, DELETED
+    @Schema(description = "Task priority", allowableValues = {"LOW", "MEDIUM", "HIGH"})
     private String priority; // LOW, MEDIUM, HIGH
     private LocalDateTime dueDate;
     private LocalDateTime completedAt;

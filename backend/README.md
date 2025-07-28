@@ -1,6 +1,6 @@
 # TodoApp Backend
 
-Spring Boot backend application for the TodoApp project.
+Spring Boot backend application for the TodoApp project with comprehensive REST API, JWT authentication, and health monitoring.
 
 ## Technology Stack
 
@@ -11,6 +11,7 @@ Spring Boot backend application for the TodoApp project.
 - **Security**: Spring Security + JWT
 - **Documentation**: OpenAPI 3 (Swagger)
 - **Containerization**: Docker/Podman
+- **Health Monitoring**: Spring Boot Actuator + Custom Health Indicators
 
 ## Prerequisites
 
@@ -37,7 +38,11 @@ Spring Boot backend application for the TodoApp project.
 
 3. **Test the application**:
    ```bash
+   # Health check
    curl http://localhost:8080/api/health
+   
+   # API documentation
+   curl http://localhost:8080/swagger-ui.html
    ```
 
 ### Docker Development
@@ -63,6 +68,7 @@ Spring Boot backend application for the TodoApp project.
   - Runs with `./gradlew bootRun`
   - Faster health checks (10s intervals)
   - Includes development tools
+  - Sample data support
 
 ### Production Image (`Dockerfile.prod`)
 
@@ -73,6 +79,7 @@ Spring Boot backend application for the TodoApp project.
   - Non-root user for security
   - Optimized JVM settings
   - Slower health checks (30s intervals)
+  - Production-optimized configuration
 
 ## Environment Configuration
 
@@ -93,12 +100,15 @@ Spring Boot backend application for the TodoApp project.
 | `SPRING_DATASOURCE_PASSWORD` | Database password | `` |
 | `JWT_SECRET` | JWT signing secret | `defaultSecretForDev` |
 | `SERVER_PORT` | Application port | `8080` |
+| `MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE` | Exposed health endpoints | `health,info` |
 
 ## API Endpoints
 
 ### Health Checks
 - `GET /api/health` - Application health status
 - `GET /api/health/database` - Database health status
+- `GET /actuator/health` - Spring Boot Actuator health
+- `GET /actuator/info` - Application information
 
 ### Authentication
 - `POST /api/auth/register` - User registration
@@ -108,11 +118,12 @@ Spring Boot backend application for the TodoApp project.
 ### User Management
 - `GET /api/users/profile` - Get user profile
 - `PUT /api/users/profile` - Update user profile
+- `DELETE /api/users/account` - Delete user account
 - `GET /api/users/settings` - Get user settings
 - `PUT /api/users/settings` - Update user settings
 
 ### Task Management
-- `GET /api/tasks` - Get all tasks
+- `GET /api/tasks` - Get all tasks (with filtering)
 - `POST /api/tasks` - Create new task
 - `GET /api/tasks/{id}` - Get task by ID
 - `PUT /api/tasks/{id}` - Update task
@@ -152,18 +163,70 @@ src/
 ├── main/
 │   ├── java/com/todoapp/
 │   │   ├── config/          # Configuration classes
+│   │   │   ├── OpenApiConfig.java
+│   │   │   ├── SecurityConfig.java
+│   │   │   ├── PasswordConfig.java
+│   │   │   └── DatabaseHealthIndicator.java
 │   │   ├── controller/      # REST controllers
+│   │   │   ├── AuthController.java
+│   │   │   ├── TaskController.java
+│   │   │   ├── CategoryController.java
+│   │   │   ├── TagController.java
+│   │   │   ├── UserController.java
+│   │   │   ├── DashboardController.java
+│   │   │   ├── NotificationController.java
+│   │   │   ├── HealthController.java
+│   │   │   └── SimpleController.java
 │   │   ├── dto/            # Data Transfer Objects
+│   │   │   ├── AuthRequest.java
+│   │   │   ├── AuthResponse.java
+│   │   │   ├── TaskDTO.java
+│   │   │   ├── CategoryDTO.java
+│   │   │   ├── TagDTO.java
+│   │   │   ├── UserDTO.java
+│   │   │   └── DashboardStatisticsDTO.java
 │   │   ├── entity/         # JPA entities
+│   │   │   ├── User.java
+│   │   │   ├── Task.java
+│   │   │   ├── Category.java
+│   │   │   ├── Tag.java
+│   │   │   ├── UserSettings.java
+│   │   │   └── Notification.java
 │   │   ├── exception/      # Custom exceptions
+│   │   │   ├── BusinessException.java
+│   │   │   ├── ResourceNotFoundException.java
+│   │   │   └── GlobalExceptionHandler.java
 │   │   ├── repository/     # Data access layer
+│   │   │   ├── UserRepository.java
+│   │   │   ├── TaskRepository.java
+│   │   │   ├── CategoryRepository.java
+│   │   │   ├── TagRepository.java
+│   │   │   ├── UserSettingsRepository.java
+│   │   │   └── NotificationRepository.java
 │   │   ├── security/       # Security configuration
+│   │   │   ├── JwtAuthenticationFilter.java
+│   │   │   ├── JwtAuthenticationEntryPoint.java
+│   │   │   ├── CustomUserDetailsService.java
+│   │   │   └── AuthenticationManagerConfig.java
 │   │   ├── service/        # Business logic
+│   │   │   ├── AuthService.java
+│   │   │   ├── TaskService.java
+│   │   │   ├── CategoryService.java
+│   │   │   ├── TagService.java
+│   │   │   ├── UserService.java
+│   │   │   ├── DashboardService.java
+│   │   │   └── NotificationService.java
 │   │   └── util/           # Utility classes
+│   │       └── JwtUtil.java
 │   └── resources/
 │       ├── application.yml # Application configuration
 │       └── db/             # Database scripts
 └── test/                   # Test classes
+    ├── java/com/todoapp/
+    │   └── security/
+    │       └── SecurityConfigTest.java
+    └── resources/
+        └── application-test.yml
 ```
 
 ### Building
@@ -189,6 +252,25 @@ The application uses PostgreSQL with the following features:
 - Flyway for migrations (disabled, using init scripts)
 - Connection pooling with HikariCP
 - Auditing with `@EntityListeners`
+- Health monitoring with custom `DatabaseHealthIndicator`
+
+### Health Monitoring
+
+The application includes comprehensive health monitoring:
+
+```bash
+# Application health
+curl http://localhost:8080/api/health
+
+# Database health
+curl http://localhost:8080/api/health/database
+
+# Spring Boot Actuator health
+curl http://localhost:8080/actuator/health
+
+# Detailed health information
+curl http://localhost:8080/actuator/health/database
+```
 
 ## Deployment
 
@@ -220,6 +302,7 @@ The application is designed to be deployed to AWS EKS with:
 - AWS ECR for container registry
 - Load balancer and ingress configuration
 - Secrets management for sensitive data
+- Health check probes for container orchestration
 
 ## Troubleshooting
 
@@ -237,12 +320,18 @@ The application is designed to be deployed to AWS EKS with:
    - Ensure PostgreSQL container is running
    - Check database credentials in `application.yml`
    - Verify network connectivity between containers
+   - Check health endpoint: `curl http://localhost:8080/api/health/database`
 
 3. **Build failures**:
    ```bash
    # Clean and rebuild
    ./gradlew clean build
    ```
+
+4. **JWT authentication issues**:
+   - Verify JWT_SECRET environment variable
+   - Check token expiration settings
+   - Validate token format in Authorization header
 
 ### Logs
 
@@ -252,7 +341,33 @@ The application is designed to be deployed to AWS EKS with:
 
 # View Docker container logs
 docker logs todoapp-backend
+
+# View health check logs
+curl http://localhost:8080/actuator/health
 ```
+
+### Health Check Diagnostics
+
+```bash
+# Check application status
+curl -s http://localhost:8080/api/health | jq
+
+# Check database connectivity
+curl -s http://localhost:8080/api/health/database | jq
+
+# Check all health indicators
+curl -s http://localhost:8080/actuator/health | jq
+```
+
+## Documentation
+
+### Additional Documentation Files
+
+- **[API Documentation](API_DOCUMENTATION.md)** - Complete REST API reference
+- **[Security Implementation](SECURITY_README.md)** - JWT authentication and security details
+- **[Health Checks](HEALTH_CHECK_README.md)** - Health monitoring and diagnostics
+- **[API Implementation Status](API_IMPLEMENTATION_STATUS.md)** - Current implementation progress
+- **[Swagger Documentation](SWAGGER_DOCUMENTATION_SUMMARY.md)** - OpenAPI/Swagger integration
 
 ## Contributing
 
@@ -260,6 +375,7 @@ docker logs todoapp-backend
 2. Add tests for new features
 3. Update documentation as needed
 4. Use meaningful commit messages
+5. Ensure health checks are implemented for new services
 
 ## License
 

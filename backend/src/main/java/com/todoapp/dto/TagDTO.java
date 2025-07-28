@@ -1,5 +1,6 @@
 package com.todoapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -9,14 +10,18 @@ import java.time.LocalDateTime;
 /**
  * DTO for Tag data transfer in API responses.
  */
+@Schema(description = "Tag data transfer object")
 public class TagDTO {
     
+    @Schema(description = "Unique identifier for the tag")
     private Long id;
     
+    @Schema(description = "Tag name", example = "urgent")
     @NotBlank(message = "Tag name is required")
     @Size(max = 30, message = "Tag name must not exceed 30 characters")
     private String name;
     
+    @Schema(description = "Tag color in hex format", example = "#FF5733")
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "Color must be a valid hex color code")
     private String color;
     
