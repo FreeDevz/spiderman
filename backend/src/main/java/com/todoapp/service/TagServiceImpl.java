@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.todoapp.exception.ResourceNotFoundException;
 
 /**
  * Service implementation for tag operations.
@@ -55,6 +56,10 @@ public class TagServiceImpl implements TagService {
     public TagDTO createTag(CreateTagRequest request, String userEmail) {
         User user = getUserByEmail(userEmail);
         
+        if (request.getName() == null || request.getName().isEmpty()) {
+            throw new IllegalArgumentException("Tag name cannot be null or empty");
+        }
+
         // Check if tag with same name already exists
         if (tagRepository.existsByNameAndUserId(request.getName(), user.getId())) {
             throw new RuntimeException("Tag with this name already exists");
@@ -73,14 +78,19 @@ public class TagServiceImpl implements TagService {
     public TagDTO updateTag(Long id, UpdateTagRequest request, String userEmail) {
         User user = getUserByEmail(userEmail);
         Tag tag = tagRepository.findByIdAndUserId(id, user.getId())
-            .orElseThrow(() -> new RuntimeException("Tag not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
         
-        // Check if new name conflicts with existing tag
-        if (request.getName() != null && !request.getName().equals(tag.getName())) {
+        if (request.getName() != null) {
+            if (request.getName().isEmpty()) {
+                throw new IllegalArgumentException("Tag name cannot be empty");
+            }
+            // Check if new name conflicts with existing tag
             if (tagRepository.existsByNameAndUserId(request.getName(), user.getId())) {
                 throw new RuntimeException("Tag with this name already exists");
             }
             tag.setName(request.getName());
+        } else if (request.getName() == null) {
+            throw new IllegalArgumentException("Tag name cannot be empty");
         }
         
         if (request.getColor() != null) {
@@ -95,7 +105,7 @@ public class TagServiceImpl implements TagService {
     public void deleteTag(Long id, String userEmail) {
         User user = getUserByEmail(userEmail);
         Tag tag = tagRepository.findByIdAndUserId(id, user.getId())
-            .orElseThrow(() -> new RuntimeException("Tag not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
         
         // Check if tag is used by any tasks
         if (!tag.getTasks().isEmpty()) {
@@ -109,13 +119,13 @@ public class TagServiceImpl implements TagService {
     public TagDTO getTag(Long id, String userEmail) {
         User user = getUserByEmail(userEmail);
         Tag tag = tagRepository.findByIdAndUserId(id, user.getId())
-            .orElseThrow(() -> new RuntimeException("Tag not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
         return convertToDTO(tag);
     }
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     private TagDTO convertToDTO(Tag tag) {

@@ -7,6 +7,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -92,10 +94,11 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        String message = ex.getMessage() != null ? ex.getMessage() : "Resource not found";
         ErrorResponse errorResponse = new ErrorResponse(
             HttpStatus.NOT_FOUND.value(),
             "Resource not found",
-            ex.getMessage(),
+            message,
             LocalDateTime.now()
         );
 
@@ -103,14 +106,76 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handle business logic exceptions.
+     * Handle business exceptions.
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
+        String message = ex.getMessage() != null ? ex.getMessage() : "Business logic error";
         ErrorResponse errorResponse = new ErrorResponse(
             HttpStatus.BAD_REQUEST.value(),
-            "Business rule violation",
+            "Business logic error",
+            message,
+            LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle illegal argument exceptions.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Invalid argument",
             ex.getMessage(),
+            LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle token expired exceptions.
+     */
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleTokenExpiredException(TokenExpiredException ex) {
+        String message = ex.getMessage() != null ? ex.getMessage() : "Token expired";
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.UNAUTHORIZED.value(),
+            "Token expired",
+            message,
+            LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Handle missing request header exceptions.
+     */
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Missing required header",
+            "Required request header '" + ex.getHeaderName() + "' is missing",
+            LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle missing request parameter exceptions.
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Missing required parameter",
+            "Required request parameter '" + ex.getParameterName() + "' is missing",
             LocalDateTime.now()
         );
 
@@ -125,7 +190,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
             HttpStatus.INTERNAL_SERVER_ERROR.value(),
             "Internal server error",
-            "An unexpected error occurred",
+            ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred",
             LocalDateTime.now()
         );
 

@@ -4,6 +4,9 @@ import com.todoapp.dto.AuthRequest;
 import com.todoapp.dto.AuthResponse;
 import com.todoapp.dto.RegisterRequest;
 import com.todoapp.dto.UserDTO;
+import com.todoapp.exception.BusinessException;
+import com.todoapp.exception.ResourceNotFoundException;
+import com.todoapp.exception.TokenExpiredException;
 import com.todoapp.service.AuthService;
 import com.todoapp.service.UserServiceInterface;
 import io.swagger.v3.oas.annotations.Operation;
@@ -105,8 +108,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> refreshToken(
             @Parameter(description = "Refresh token from Authorization header", required = true)
             @RequestHeader("Authorization") String refreshToken) {
-        AuthResponse response = authService.refreshToken(refreshToken);
-        return ResponseEntity.ok(response);
+        try {
+            // Remove "Bearer " prefix if present
+            String token = refreshToken.startsWith("Bearer ") ? refreshToken.substring(7) : refreshToken;
+            AuthResponse response = authService.refreshToken(token);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Invalid token format");
+        }
     }
 
     @Operation(
@@ -122,9 +131,24 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> forgotPassword(
             @Parameter(description = "Email address for password reset", required = true)
             @RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        authService.forgotPassword(email);
-        return ResponseEntity.ok(Map.of("message", "Password reset email sent"));
+        try {
+            if (request == null) {
+                throw new BusinessException("Request body is required");
+            }
+            String email = request.get("email");
+            if (email == null || email.trim().isEmpty()) {
+                throw new BusinessException("Email is required");
+            }
+            authService.forgotPassword(email);
+            return ResponseEntity.ok(Map.of("message", "Password reset email sent"));
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Invalid email format");
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                throw new ResourceNotFoundException("User not found");
+            }
+            throw e;
+        }
     }
 
     @Operation(
@@ -140,10 +164,30 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> resetPassword(
             @Parameter(description = "Password reset request with token and new password", required = true)
             @RequestBody Map<String, String> request) {
-        String token = request.get("token");
-        String newPassword = request.get("newPassword");
-        authService.resetPassword(token, newPassword);
-        return ResponseEntity.ok(Map.of("message", "Password reset successful"));
+        try {
+            if (request == null) {
+                throw new BusinessException("Request body is required");
+            }
+            String token = request.get("token");
+            String newPassword = request.get("newPassword");
+            
+            if (token == null || token.trim().isEmpty()) {
+                throw new BusinessException("Token is required");
+            }
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                throw new BusinessException("New password is required");
+            }
+            
+            authService.resetPassword(token, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Password reset successful"));
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Invalid token or password");
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("expired")) {
+                throw new BusinessException("Token expired");
+            }
+            throw e;
+        }
     }
 
     @Operation(
@@ -159,7 +203,16 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> verifyEmail(
             @Parameter(description = "Email verification token", required = true)
             @RequestParam String token) {
-        authService.verifyEmail(token);
-        return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
+        try {
+            authService.verifyEmail(token);
+            return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Invalid verification token");
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("expired")) {
+                throw new TokenExpiredException("Token expired");
+            }
+            throw e;
+        }
     }
 } 

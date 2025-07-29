@@ -1,4 +1,4 @@
-package com.todoapp.security;
+package com.todoapp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -6,7 +6,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 /**
- * Basic test to verify security configuration loads correctly.
+ * Integration tests for TodoApp application.
+ * Tests the full Spring context and basic functionality.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -19,11 +20,17 @@ import org.springframework.test.context.TestPropertySource;
     "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.flyway.enabled=false"
 })
-public class SecurityConfigTest {
+class TodoAppApplicationTests {
 
     @Test
-    public void contextLoads() {
+    void contextLoads() {
         // This test verifies that the Spring context loads successfully
-        // with all security components properly configured
+        // with all beans properly configured
+    }
+
+    @Test
+    void applicationStartsSuccessfully() {
+        // This test verifies that the application can start without errors
+        // All required beans are available and properly configured
     }
 } 

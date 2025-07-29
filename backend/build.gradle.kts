@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.4"
+    id("jacoco")
 }
 
 group = "com.todoapp"
@@ -59,6 +60,13 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("com.h2database:h2")
+    
+    // Test Coverage
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind")
+    testImplementation("org.springframework.boot:spring-boot-starter-validation")
 }
 
 dependencyManagement {
@@ -97,4 +105,21 @@ tasks.register("dockerBuild") {
 tasks.wrapper {
     gradleVersion = "8.5"
     distributionType = Wrapper.DistributionType.BIN
+} 
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.withType<Test> {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.required.set(true)
+    }
 } 

@@ -177,21 +177,4 @@ spring:
     username: todouser
     password: ${DB_PASSWORD:todopass}
 
----
-# Test Profile
-spring:
-  config:
-    activate:
-      on-profile: test
-  
-  # Test Database (H2 in-memory)
-  datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password: password
-    driver-class-name: org.h2.Driver
-  
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true 
+ 

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,7 @@ public class TaskController {
         description = "Creates a new task with the provided details"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Task created successfully",
+        @ApiResponse(responseCode = "201", description = "Task created successfully",
             content = @Content(schema = @Schema(implementation = TaskDTO.class))),
         @ApiResponse(responseCode = "400", description = "Invalid input data"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
@@ -88,7 +89,7 @@ public class TaskController {
         
         String userEmail = authentication.getName();
         TaskDTO task = taskService.createTask(request, userEmail);
-        return ResponseEntity.ok(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(task);
     }
 
     @Operation(
@@ -141,19 +142,19 @@ public class TaskController {
         description = "Deletes a task by its ID"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Task deleted successfully"),
+        @ApiResponse(responseCode = "204", description = "Task deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Task not found"),
         @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteTask(
+    public ResponseEntity<Void> deleteTask(
             @Parameter(description = "Task ID", required = true)
             @PathVariable Long id,
             Authentication authentication) {
         
         String userEmail = authentication.getName();
         taskService.deleteTask(id, userEmail);
-        return ResponseEntity.ok(Map.of("message", "Task deleted successfully"));
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(

@@ -37,6 +37,9 @@ public class JwtUtil {
      * @return JWT token
      */
     public String generateToken(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
+        }
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
@@ -51,6 +54,9 @@ public class JwtUtil {
      * @return Refresh token
      */
     public String generateRefreshToken(String email) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
+        }
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
@@ -141,8 +147,14 @@ public class JwtUtil {
      * @return true if expired, false otherwise
      */
     public boolean isTokenExpired(String token) {
-        Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
+        try {
+            Date expiration = getExpirationDateFromToken(token);
+            return expiration.before(new Date());
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return true;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     /**
