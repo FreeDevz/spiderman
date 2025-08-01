@@ -314,10 +314,10 @@ class TaskServiceTest {
         when(taskRepository.save(any())).thenReturn(statusTask);
 
         // When
-        TaskDTO result = taskService.updateTaskStatus(1L, "COMPLETED", "test@example.com");
+        TaskDTO result = taskService.updateTaskStatus(1L, "completed", "test@example.com");
 
         // Then
-        assertThat(result.getStatus()).isEqualTo("COMPLETED");
+        assertThat(result.getStatus()).isEqualTo("completed");
         verify(userRepository).findByEmail("test@example.com");
         verify(taskRepository).findByIdAndUserId(1L, 1L);
         verify(taskRepository).save(any(Task.class));

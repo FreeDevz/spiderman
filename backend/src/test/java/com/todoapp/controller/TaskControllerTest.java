@@ -56,8 +56,8 @@ class TaskControllerTest {
         testTaskDTO.setId(1L);
         testTaskDTO.setTitle("Test Task");
         testTaskDTO.setDescription("Test Description");
-        testTaskDTO.setStatus("PENDING");
-        testTaskDTO.setPriority("MEDIUM");
+        testTaskDTO.setStatus("pending");
+        testTaskDTO.setPriority("medium");
         testTaskDTO.setDueDate(LocalDateTime.now().plusDays(1));
 
         createRequest = new CreateTaskRequest();
@@ -84,10 +84,10 @@ class TaskControllerTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].id").value(1))
-                .andExpect(jsonPath("$.content[0].title").value("Test Task"))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.tasks").isArray())
+                .andExpect(jsonPath("$.tasks[0].id").value(1))
+                .andExpect(jsonPath("$.tasks[0].title").value("Test Task"))
+                .andExpect(jsonPath("$.pagination.total").value(1));
     }
 
     @WithMockUser(username = "test@example.com")
@@ -96,17 +96,17 @@ class TaskControllerTest {
         // Given
         Pageable pageable = PageRequest.of(0, 10);
         Page<TaskDTO> taskPage = new PageImpl<>(Arrays.asList(testTaskDTO), pageable, 1);
-        when(taskService.getTasks(eq("test@example.com"), eq("PENDING"), eq("HIGH"), eq(1L), eq("test"), any(Pageable.class))).thenReturn(taskPage);
+        when(taskService.getTasks(eq("test@example.com"), eq("pending"), eq("high"), eq(1L), eq("test"), any(Pageable.class))).thenReturn(taskPage);
 
         // When & Then
         mockMvc.perform(get("/api/tasks")
-                        .param("status", "PENDING")
-                        .param("priority", "HIGH")
+                        .param("status", "pending")
+                        .param("priority", "high")
                         .param("categoryId", "1")
                         .param("search", "test"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].id").value(1));
+                .andExpect(jsonPath("$.tasks").isArray())
+                .andExpect(jsonPath("$.tasks[0].id").value(1));
     }
 
     @WithMockUser(username = "test@example.com")

@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Controller for Task operations.
@@ -53,7 +54,7 @@ public class TaskController {
         @ApiResponse(responseCode = "400", description = "Invalid parameters")
     })
     @GetMapping
-    public ResponseEntity<Page<TaskDTO>> getTasks(
+    public ResponseEntity<Map<String, Object>> getTasks(
             @Parameter(description = "Filter by task status (TODO, IN_PROGRESS, COMPLETED)")
             @RequestParam(required = false) String status,
             @Parameter(description = "Filter by priority (LOW, MEDIUM, HIGH)")
@@ -67,8 +68,34 @@ public class TaskController {
             Authentication authentication) {
         
         String userEmail = authentication.getName();
-        Page<TaskDTO> tasks = taskService.getTasks(userEmail, status, priority, categoryId, search, pageable);
-        return ResponseEntity.ok(tasks);
+        System.out.println("Getting tasks for user: " + userEmail);
+        
+        // Fix pagination: convert 1-based page numbers to 0-based
+        Pageable adjustedPageable = pageable;
+        if (pageable.getPageNumber() > 0) {
+            adjustedPageable = org.springframework.data.domain.PageRequest.of(
+                pageable.getPageNumber() - 1, 
+                pageable.getPageSize(), 
+                pageable.getSort()
+            );
+        }
+        
+        Page<TaskDTO> page = taskService.getTasks(userEmail, status, priority, categoryId, search, adjustedPageable);
+        
+        System.out.println("Page total elements: " + page.getTotalElements());
+        System.out.println("Page content size: " + page.getContent().size());
+        System.out.println("Page content: " + page.getContent());
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("tasks", page.getContent());
+        response.put("pagination", Map.of(
+            "page", page.getNumber(),
+            "limit", page.getSize(),
+            "total", page.getTotalElements(),
+            "totalPages", page.getTotalPages()
+        ));
+        
+        return ResponseEntity.ok(response);
     }
 
     @Operation(

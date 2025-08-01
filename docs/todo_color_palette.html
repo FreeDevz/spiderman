@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO App Color Palette</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 3rem 2rem;
+        }
+        
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        .section h2 {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .color-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .color-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .color-swatch {
+            height: 120px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .color-info {
+            padding: 1.5rem;
+        }
+        
+        .color-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .color-codes {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .color-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            background: #f7fafc;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .gradient-demo {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+        
+        .gradient-sample {
+            height: 80px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .usage-item {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TODO App Color Palette</h1>
+            <p>Modern, sleek colors for your productivity app</p>
+        </div>
+        
+        <div class="content">
+            <!-- Primary Colors -->
+            <div class="section">
+                <h2>🎨 Primary Colors</h2>
+                <div class="color-grid">
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <button class="copy-btn" onclick="copyToClipboard('#667eea')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Primary Gradient</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #667eea → #764ba2</div>
+                                <div class="color-code">RGB: 102,126,234 → 118,75,162</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #667eea;">
+                            <button class="copy-btn" onclick="copyToClipboard('#667eea')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Primary Blue</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #667eea</div>
+                                <div class="color-code">RGB: 102, 126, 234</div>
+                                <div class="color-code">HSL: 232°, 76%, 66%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #764ba2;">
+                            <button class="copy-btn" onclick="copyToClipboard('#764ba2')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Primary Purple</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #764ba2</div>
+                                <div class="color-code">RGB: 118, 75, 162</div>
+                                <div class="color-code">HSL: 270°, 37%, 46%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Accent Colors -->
+            <div class="section">
+                <h2>✨ Accent Colors</h2>
+                <div class="color-grid">
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);">
+                            <button class="copy-btn" onclick="copyToClipboard('#4ade80')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Success Green</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #4ade80 → #22c55e</div>
+                                <div class="color-code">Use: Completed tasks, success states</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);">
+                            <button class="copy-btn" onclick="copyToClipboard('#60a5fa')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Dashboard Blue</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #60a5fa → #3b82f6</div>
+                                <div class="color-code">Use: Charts, analytics, info states</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #fbbf24;">
+                            <button class="copy-btn" onclick="copyToClipboard('#fbbf24')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Warning Amber</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #fbbf24</div>
+                                <div class="color-code">Use: Pending tasks, notifications</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Neutral Colors -->
+            <div class="section">
+                <h2>🔲 Neutral Colors</h2>
+                <div class="color-grid">
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #1f2937;">
+                            <button class="copy-btn" onclick="copyToClipboard('#1f2937')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Dark Gray</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #1f2937</div>
+                                <div class="color-code">Use: Primary text, headers</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #6b7280;">
+                            <button class="copy-btn" onclick="copyToClipboard('#6b7280')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Medium Gray</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #6b7280</div>
+                                <div class="color-code">Use: Secondary text, icons</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-card">
+                        <div class="color-swatch" style="background: #f9fafb;">
+                            <button class="copy-btn" onclick="copyToClipboard('#f9fafb')">Copy</button>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Light Gray</div>
+                            <div class="color-codes">
+                                <div class="color-code">HEX: #f9fafb</div>
+                                <div class="color-code">Use: Backgrounds, cards</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gradient Examples -->
+            <div class="section">
+                <h2>🌈 Gradient Combinations</h2>
+                <div class="gradient-demo">
+                    <div class="gradient-sample" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        Primary App Gradient
+                    </div>
+                    <div class="gradient-sample" style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);">
+                        Success Action Gradient
+                    </div>
+                    <div class="gradient-sample" style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);">
+                        Dashboard Accent Gradient
+                    </div>
+                    <div class="gradient-sample" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #1f2937;">
+                        Subtle Background Gradient
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Usage Guidelines -->
+            <div class="section">
+                <h2>📋 Usage Guidelines</h2>
+                <div class="usage-grid">
+                    <div class="usage-item" style="border-left-color: #667eea;">
+                        <h3 style="color: #667eea; margin-bottom: 0.5rem;">Primary Actions</h3>
+                        <p>Use primary gradient for main CTAs, app branding, and key interactive elements.</p>
+                    </div>
+                    
+                    <div class="usage-item" style="border-left-color: #4ade80;">
+                        <h3 style="color: #22c55e; margin-bottom: 0.5rem;">Success States</h3>
+                        <p>Green gradient for completed tasks, success messages, and positive feedback.</p>
+                    </div>
+                    
+                    <div class="usage-item" style="border-left-color: #60a5fa;">
+                        <h3 style="color: #3b82f6; margin-bottom: 0.5rem;">Analytics</h3>
+                        <p>Blue gradient for dashboard elements, charts, and data visualization.</p>
+                    </div>
+                    
+                    <div class="usage-item" style="border-left-color: #fbbf24;">
+                        <h3 style="color: #fbbf24; margin-bottom: 0.5rem;">Attention</h3>
+                        <p>Amber for pending items, warnings, and elements requiring user attention.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Visual feedback
+                event.target.textContent = 'Copied!';
+                setTimeout(() => {
+                    event.target.textContent = 'Copy';
+                }, 1000);
+            });
+        }
+    </script>
+</body>
+</html>

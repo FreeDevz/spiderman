@@ -49,6 +49,7 @@ public class TaskServiceImpl implements TaskService {
     public Page<TaskDTO> getTasks(String userEmail, String status, String priority, 
                                  Long categoryId, String search, Pageable pageable) {
         User user = getUserByEmail(userEmail);
+        System.out.println("Getting tasks for user ID: " + user.getId());
         
         Page<Task> tasks;
         
@@ -66,7 +67,21 @@ public class TaskServiceImpl implements TaskService {
             tasks = taskRepository.findByUserId(user.getId(), pageable);
         }
         
-        return tasks.map(this::convertToDTO);
+        System.out.println("Found " + tasks.getTotalElements() + " tasks in database");
+        System.out.println("Tasks content size: " + tasks.getContent().size());
+        System.out.println("Page number: " + pageable.getPageNumber());
+        System.out.println("Page size: " + pageable.getPageSize());
+        System.out.println("Offset: " + pageable.getOffset());
+        
+        try {
+            Page<TaskDTO> result = tasks.map(this::convertToDTO);
+            System.out.println("Mapped to " + result.getContent().size() + " DTOs");
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error during mapping: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
@@ -261,31 +276,40 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private TaskDTO convertToDTO(Task task) {
-        TaskDTO dto = new TaskDTO();
-        dto.setId(task.getId());
-        dto.setTitle(task.getTitle());
-        dto.setDescription(task.getDescription());
-        dto.setStatus(task.getStatus().name());
-        dto.setPriority(task.getPriority().name());
-        dto.setDueDate(task.getDueDate());
-        dto.setCompletedAt(task.getCompletedAt());
-        dto.setCreatedAt(task.getCreatedAt());
-        dto.setUpdatedAt(task.getUpdatedAt());
-        dto.setOverdue(task.isOverdue());
-        
-        if (task.getCategory() != null) {
-            dto.setCategoryId(task.getCategory().getId());
-            dto.setCategoryName(task.getCategory().getName());
-            dto.setCategoryColor(task.getCategory().getColor());
+        try {
+            System.out.println("Converting task: " + task.getId() + " - " + task.getTitle());
+            
+            TaskDTO dto = new TaskDTO();
+            dto.setId(task.getId());
+            dto.setTitle(task.getTitle());
+            dto.setDescription(task.getDescription());
+            dto.setStatus(task.getStatus().getValue());
+            dto.setPriority(task.getPriority().getValue());
+            dto.setDueDate(task.getDueDate());
+            dto.setCompletedAt(task.getCompletedAt());
+            dto.setCreatedAt(task.getCreatedAt());
+            dto.setUpdatedAt(task.getUpdatedAt());
+            dto.setOverdue(task.isOverdue());
+            
+            if (task.getCategory() != null) {
+                dto.setCategoryId(task.getCategory().getId());
+                dto.setCategoryName(task.getCategory().getName());
+                dto.setCategoryColor(task.getCategory().getColor());
+            }
+            
+            if (task.getTags() != null) {
+                dto.setTags(task.getTags().stream()
+                    .map(this::convertTagToDTO)
+                    .collect(Collectors.toSet()));
+            }
+            
+            System.out.println("Successfully converted task: " + dto.getId() + " - " + dto.getTitle());
+            return dto;
+        } catch (Exception e) {
+            System.err.println("Error converting task " + task.getId() + ": " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        
-        if (task.getTags() != null) {
-            dto.setTags(task.getTags().stream()
-                .map(this::convertTagToDTO)
-                .collect(Collectors.toSet()));
-        }
-        
-        return dto;
     }
 
     private com.todoapp.dto.TagDTO convertTagToDTO(Tag tag) {
