@@ -75,20 +75,50 @@ const TasksPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [showCompleted, setShowCompleted] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    console.log('TasksPage: Component mounted, resetting state');
+    // Reset task state when entering the tasks page
+    dispatch(clearFilters());
+    dispatch(clearSort());
+    dispatch(clearSearchQuery());
+    dispatch(deselectAllTasks());
+    
     dispatch(fetchCategories());
     dispatch(fetchTags());
+    
+    // Mark as initialized
+    setIsInitialized(true);
+  }, [dispatch]);
+
+  // Cleanup effect when component unmounts
+  useEffect(() => {
+    return () => {
+      // Clean up when leaving the tasks page
+      dispatch(deselectAllTasks());
+    };
   }, [dispatch]);
 
   useEffect(() => {
+    // Only fetch tasks after the component is properly initialized
+    if (!isInitialized) return;
+    
+    // Clear any existing search query when entering the tasks page
+    if (searchQuery) {
+      dispatch(clearSearchQuery());
+    }
+    
     const params = {
       filters: showCompleted ? filters : { ...filters, status: 'pending' as const },
       sort: sort || undefined,
       page: currentPage,
     };
+    
+    // Force a fresh fetch for the tasks page to ensure we get the latest data
+    // and don't rely on cached state from the dashboard
     dispatch(fetchTasks(params));
-  }, [dispatch, filters, sort, currentPage, showCompleted]);
+  }, [dispatch, filters, sort, currentPage, showCompleted, searchQuery, isInitialized]);
 
   const handleCreateTask = async (taskData: CreateTaskRequest | UpdateTaskRequest) => {
     try {

@@ -37,6 +37,7 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
+      console.log('LoginPage: User is authenticated, navigating to dashboard');
       navigate(ROUTES.DASHBOARD);
     }
   }, [isAuthenticated, navigate]);

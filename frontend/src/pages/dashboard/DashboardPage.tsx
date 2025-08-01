@@ -5,7 +5,11 @@ import { Plus, Calendar, Clock, AlertTriangle, CheckCircle, TrendingUp, CheckSqu
 import type { RootState } from '../../store';
 import { 
   fetchTasks,
-  createTask 
+  createTask,
+  clearFilters,
+  clearSort,
+  clearSearchQuery,
+  deselectAllTasks
 } from '../../store/slices/taskSlice';
 import { fetchCategories } from '../../store/slices/categorySlice';
 import { fetchTags } from '../../store/slices/tagSlice';
@@ -34,7 +38,15 @@ const DashboardPage: React.FC = () => {
   const [quickAddTitle, setQuickAddTitle] = useState('');
 
   useEffect(() => {
-    // Fetch all tasks instead of filtered ones for better user experience
+    console.log('DashboardPage: Component mounted, fetching data');
+    
+    // Clear any existing task state to ensure clean dashboard view
+    dispatch(clearFilters());
+    dispatch(clearSort());
+    dispatch(clearSearchQuery());
+    dispatch(deselectAllTasks());
+    
+    // Fetch all tasks for dashboard statistics and overview
     dispatch(fetchTasks({}));
     dispatch(fetchCategories());
     dispatch(fetchTags());
@@ -146,21 +158,21 @@ const DashboardPage: React.FC = () => {
   );
 
   const TaskItem: React.FC<{ task: Task; showCategory?: boolean }> = ({ task, showCategory = true }) => (
-    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+    <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
       <div className="flex-1 min-w-0">
-        <p className={`text-sm ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+        <p className={`text-sm font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>
           {task.title}
         </p>
         <div className="flex items-center space-x-2 mt-1">
           {showCategory && task.category && (
             <span 
-              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+              className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium"
               style={{ backgroundColor: `${task.category.color}20`, color: task.category.color }}
             >
               {task.category.name}
             </span>
           )}
-          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+          <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
             {task.priority}
           </span>
           {task.dueDate && (
@@ -263,21 +275,21 @@ const DashboardPage: React.FC = () => {
               <p className="text-gray-500">No tasks for today</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {tasks.filter(task => {
                 if (task.status !== 'pending' || !task.dueDate) return false;
                 const today = new Date().toDateString();
                 return new Date(task.dueDate).toDateString() === today;
-              }).slice(0, 5).map((task) => (
-                <TaskItem key={task.id} task={task} />
+              }).slice(0, 3).map((task) => (
+                <TaskItem key={task.id} task={task} showCategory={false} />
               ))}
             </div>
           )}
           
-          {statistics.todayTasks > 5 && (
+          {statistics.todayTasks > 3 && (
             <div className="mt-4 text-center">
               <Button variant="outline" size="sm">
-                View all tasks
+                View all today's tasks
               </Button>
             </div>
           )}
@@ -296,23 +308,23 @@ const DashboardPage: React.FC = () => {
               <p className="text-gray-500">No upcoming tasks</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {tasks.filter(task => {
                 if (task.status !== 'pending' || !task.dueDate) return false;
                 const today = new Date();
                 const taskDate = new Date(task.dueDate);
                 const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
                 return taskDate > today && taskDate <= nextWeek;
-              }).slice(0, 5).map((task) => (
-                <TaskItem key={task.id} task={task} />
+              }).slice(0, 3).map((task) => (
+                <TaskItem key={task.id} task={task} showCategory={false} />
               ))}
             </div>
           )}
           
-          {statistics.upcomingTasks > 5 && (
+          {statistics.upcomingTasks > 3 && (
             <div className="mt-4 text-center">
               <Button variant="outline" size="sm">
-                View all upcoming
+                View all upcoming tasks
               </Button>
             </div>
           )}
