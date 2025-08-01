@@ -29,8 +29,8 @@ const App: React.FC = () => {
             <Route path="/" element={<ProtectedRoute />}>
               <Route element={<Layout />}>
                 <Route index element={<Navigate to={ROUTES.DASHBOARD} replace />} />
-                <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
-                <Route path={ROUTES.TASKS} element={<TasksPage />} />
+                <Route path={ROUTES.DASHBOARD} element={<DashboardPage key="dashboard" />} />
+                <Route path={ROUTES.TASKS} element={<TasksPage key="tasks" />} />
                 <Route path={ROUTES.CATEGORIES} element={<CategoriesPage />} />
                 <Route path={ROUTES.TAGS} element={<TagsPage />} />
                 <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />

@@ -37,9 +37,7 @@ const DashboardPage: React.FC = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [quickAddTitle, setQuickAddTitle] = useState('');
 
-  useEffect(() => {
-    console.log('DashboardPage: Component mounted, fetching data');
-    
+    useEffect(() => {
     // Clear any existing task state to ensure clean dashboard view
     dispatch(clearFilters());
     dispatch(clearSort());
@@ -193,9 +191,10 @@ const DashboardPage: React.FC = () => {
     );
   }
 
-  return (
+    return (
     <div className="space-y-6">
-      {/* Header */}
+        
+        {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>

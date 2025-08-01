@@ -78,7 +78,6 @@ const TasksPage: React.FC = () => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    console.log('TasksPage: Component mounted, resetting state');
     // Reset task state when entering the tasks page
     dispatch(clearFilters());
     dispatch(clearSort());
@@ -387,9 +386,10 @@ const TasksPage: React.FC = () => {
     );
   }
 
-  return (
+    return (
     <div className="space-y-6">
-      {/* Header */}
+        
+        {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">All Tasks</h1>

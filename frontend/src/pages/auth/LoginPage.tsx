@@ -27,6 +27,8 @@ const LoginPage: React.FC = () => {
   const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [showPassword, setShowPassword] = React.useState(false);
 
+
+
   const {
     register,
     handleSubmit,
@@ -37,8 +39,7 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('LoginPage: User is authenticated, navigating to dashboard');
-      navigate(ROUTES.DASHBOARD);
+      navigate(ROUTES.DASHBOARD, { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
