@@ -22,6 +22,9 @@ A sleek, modern TODO web application built with **React**, **Spring Boot**, and 
 
 ### 🎨 Modern UI/UX
 - **Responsive Design** - Seamless experience across desktop, tablet, and mobile
+- **shadcn/ui Components** - Modern, accessible UI components with consistent design
+- **Custom Color Palette** - Beautiful gradients and color system from the app's design docs
+- **App Logo Integration** - Custom SVG logo with gradient backgrounds
 - **Dark/Light Theme** - Customizable appearance with system preference detection
 - **Accessibility First** - Screen reader support, keyboard navigation, high contrast mode
 - **Progressive Web App** - Offline functionality with service worker caching
@@ -53,12 +56,36 @@ graph TB
 ```
 
 ### Technology Stack
-- **Frontend**: React 18+ with TypeScript, Redux Toolkit, Tailwind CSS
+- **Frontend**: React 18+ with TypeScript, Redux Toolkit, Tailwind CSS, shadcn/ui
 - **Backend**: Spring Boot 3.5.4 with Java 21, Spring Security, Spring Data JPA
 - **Database**: PostgreSQL 15+ with environment-specific Docker containers
 - **Container**: Podman with separate development and production images
 - **Deployment**: Podman Desktop with auto-scaling and health monitoring
 - **Development**: Hot-reload and comprehensive testing support
+
+## 🎨 Design System
+
+### Color Palette
+The app uses a carefully crafted color palette with beautiful gradients:
+
+- **Primary Gradient**: `#667eea` → `#764ba2` (Blue to Purple)
+- **Success Gradient**: `#4ade80` → `#22c55e` (Green)
+- **Dashboard Gradient**: `#60a5fa` → `#3b82f6` (Blue)
+- **Warning**: `#fbbf24` (Amber)
+- **Error**: `#ef4444` (Red)
+
+### UI Components
+Built with **shadcn/ui** for consistent, accessible components:
+- **Button**: Multiple variants (default, success, warning, dashboard, outline, ghost)
+- **Card**: Clean, modern card layouts with headers and content
+- **Input**: Styled form inputs with focus states
+- **Logo**: Custom SVG logo with gradient backgrounds
+
+### Features
+- **Gradient Backgrounds**: Beautiful gradient overlays throughout the app
+- **Consistent Spacing**: 8px grid system for perfect alignment
+- **Smooth Animations**: Fade-in, slide-up, and scale animations
+- **Responsive Design**: Mobile-first approach with breakpoint optimization
 
 ## 🚀 Quick Start
 
@@ -77,6 +104,7 @@ cd todo-app
 # Build and deploy using individual Dockerfiles (recommended)
 cd database && podman build -t todoapp-database:latest .
 cd ../backend && podman build -t todoapp-backend:latest .
+cd ../frontend && podman build -t todoapp-frontend:latest .
 
 # Create network and run containers
 cd .. && podman network create todo-network
@@ -90,13 +118,19 @@ sleep 10 && podman run -d --name todoapp-backend --network todo-network -p 8080:
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://todoapp-database:5432/tododb \
   -e SPRING_DATASOURCE_USERNAME=todouser -e SPRING_DATASOURCE_PASSWORD=todopass \
   -e JWT_SECRET=defaultSecretForDev todoapp-backend:latest
+
+# Start frontend
+podman run -d --name todoapp-frontend --network todo-network -p 3000:80 \
+  todoapp-frontend:latest
 ```
 
 ### 2. Access the Application
+- **Frontend Application**: http://localhost:3000
 - **Backend API**: http://localhost:8080/api
 - **API Documentation**: http://localhost:8080/swagger-ui.html
 - **OpenAPI Spec**: http://localhost:8080/v3/api-docs
 - **Health Checks**: http://localhost:8080/actuator/health
+- **Frontend Health**: http://localhost:3000/health
 - **Database**: localhost:5432 (tododb/todouser/todopass)
 
 ### 3. Test API Endpoints

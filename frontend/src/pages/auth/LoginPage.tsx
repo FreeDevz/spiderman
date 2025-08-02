@@ -9,8 +9,10 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import type { RootState } from '../../store';
 import { login, clearError } from '../../store/slices/authSlice';
 import { ROUTES } from '../../constants';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import Logo from '../../components/common/Logo';
 
 // Validation schema
 const loginSchema = z.object({
@@ -26,8 +28,6 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [showPassword, setShowPassword] = React.useState(false);
-
-
 
   const {
     register,
@@ -61,146 +61,164 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary-100">
-            <span className="text-2xl">✓</span>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            TodoApp
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Welcome back! Sign in to your account
-          </p>
-        </div>
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          {error && (
-            <div className="bg-error-50 border border-error-200 rounded-lg p-4">
-              <p className="text-sm text-error-600">{error}</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full">
+        <Card className="shadow-2xl border-0">
+          <CardHeader className="text-center pb-8">
+            <div className="flex justify-center mb-4">
+              <Logo size="lg" />
             </div>
-          )}
+            <CardTitle className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Welcome Back
+            </CardTitle>
+            <CardDescription className="text-gray-600 text-base">
+              Sign in to your TodoApp account
+            </CardDescription>
+          </CardHeader>
 
-          <div className="space-y-4">
-            <Input
-              label="Email address"
-              type="email"
-              placeholder="john@example.com"
-              leftIcon={<Mail className="h-5 w-5" />}
-              error={errors.email?.message}
-              {...register('email')}
-            />
+          <CardContent className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {error && (
+                <div className="bg-error-50 border border-error-200 rounded-lg p-4 animate-fade-in">
+                  <p className="text-sm text-error-600 font-medium">{error}</p>
+                </div>
+              )}
 
-            <div className="relative">
-              <Input
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="••••••••••••"
-                leftIcon={<Lock className="h-5 w-5" />}
-                rightIcon={
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-gray-400 hover:text-gray-600"
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                    Email address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                                         <Input
+                       id="email"
+                       type="email"
+                       placeholder="john@example.com"
+                       className="pl-10"
+                       {...register('email')}
+                     />
+                  </div>
+                  {errors.email && (
+                    <p className="text-sm text-error-600">{errors.email.message}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••••••"
+                      className="pl-10 pr-10"
+                      {...register('password')}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-sm text-error-600">{errors.password.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    {...register('rememberMe')}
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                    Remember me
+                  </label>
+                </div>
+
+                <div className="text-sm">
+                  <Link
+                    to="/forgot-password"
+                    className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                }
-                error={errors.password?.message}
-                {...register('password')}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                {...register('rememberMe')}
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <Link
-                to="/forgot-password"
-                className="font-medium text-primary-600 hover:text-primary-500"
-              >
-                Forgot password?
-              </Link>
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            loading={loading}
-            fullWidth
-          >
-            Sign In
-          </Button>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-50 text-gray-500">or continue with</span>
+
+              <Button
+                type="submit"
+                variant="default"
+                size="lg"
+                disabled={loading}
+                className="w-full h-12 text-base font-semibold"
+              >
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white text-gray-500">or continue with</span>
+                </div>
               </div>
-            </div>
 
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="w-full"
-              >
-                <span className="mr-2">🔍</span>
-                Google
-              </Button>
+              <div className="grid grid-cols-3 gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-10"
+                >
+                  <span className="mr-2">🔍</span>
+                  Google
+                </Button>
 
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="w-full"
-              >
-                <span className="mr-2">📘</span>
-                GitHub
-              </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-10"
+                >
+                  <span className="mr-2">📘</span>
+                  GitHub
+                </Button>
 
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="w-full"
-              >
-                <span className="mr-2">🐙</span>
-                GitLab
-              </Button>
-            </div>
-          </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-10"
+                >
+                  <span className="mr-2">🐙</span>
+                  GitLab
+                </Button>
+              </div>
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link
-                to={ROUTES.REGISTER}
-                className="font-medium text-primary-600 hover:text-primary-500"
-              >
-                Sign up here
-              </Link>
-            </p>
-          </div>
-        </form>
+              <div className="text-center pt-4">
+                <p className="text-sm text-gray-600">
+                  Don't have an account?{' '}
+                  <Link
+                    to={ROUTES.REGISTER}
+                    className="font-semibold text-primary-600 hover:text-primary-500 transition-colors"
+                  >
+                    Sign up here
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

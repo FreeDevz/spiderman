@@ -1,19 +1,20 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { X, BarChart3, CheckSquare, Calendar, Clock, AlertTriangle, CheckCircle, FolderOpen, Tag, Settings, Download, Upload, LogOut } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import type { AppDispatch } from '../../store';
+import { BarChart3, CheckSquare, Calendar, Clock, AlertTriangle, CheckCircle, FolderOpen, Tag, Settings, LogOut, Home, Search, Plus, X } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '../../store';
 import { logout } from '../../store/slices/authSlice';
 import { ROUTES } from '../../constants';
+import Logo from '../common/Logo';
 
 interface SidebarProps {
-  open: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = async () => {
     try {
@@ -24,23 +25,14 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   };
 
   const navigation = [
-    { name: 'Dashboard', href: ROUTES.DASHBOARD, icon: BarChart3 },
+    { name: 'Home', href: ROUTES.DASHBOARD, icon: Home },
     { name: 'All Tasks', href: ROUTES.TASKS, icon: CheckSquare },
     { name: 'Today', href: `${ROUTES.TASKS}?filter=today`, icon: Calendar },
     { name: 'Upcoming', href: `${ROUTES.TASKS}?filter=upcoming`, icon: Clock },
     { name: 'Overdue', href: `${ROUTES.TASKS}?filter=overdue`, icon: AlertTriangle },
     { name: 'Completed', href: `${ROUTES.TASKS}?filter=completed`, icon: CheckCircle },
-  ];
-
-  const organization = [
     { name: 'Categories', href: ROUTES.CATEGORIES, icon: FolderOpen },
     { name: 'Tags', href: ROUTES.TAGS, icon: Tag },
-  ];
-
-  const tools = [
-    { name: 'Settings', href: ROUTES.SETTINGS, icon: Settings },
-    { name: 'Export Data', href: '/export', icon: Download },
-    { name: 'Import Data', href: '/import', icon: Upload },
   ];
 
   const isActive = (href: string) => {
@@ -50,210 +42,88 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     return location.pathname.startsWith(href);
   };
 
+  const renderNavItem = (item: any) => {
+    const Icon = item.icon;
+    const active = isActive(item.href);
+    
+    return (
+      <Link
+        key={item.name}
+        to={item.href}
+        className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 mb-1 ${
+          active
+            ? 'text-gray-900 bg-gray-100'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+        onClick={onClose}
+      >
+        <Icon className={`mr-3 h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-500'}`} />
+        {item.name}
+      </Link>
+    );
+  };
+
   return (
-    <>
-      {/* Mobile sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:hidden ${open ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">TodoApp</h2>
+    <div className="flex flex-col h-full bg-white">
+      {/* Logo section with mobile close button */}
+      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+        <div className="flex items-center space-x-3">
+          <Logo size="sm" />
+          <h2 className="text-lg font-bold text-gray-900">TodoApp</h2>
+        </div>
+        {onClose && (
           <button
             type="button"
-            className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+            className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             onClick={onClose}
           >
             <X className="h-6 w-6" />
           </button>
-        </div>
-        
-        <nav className="mt-5 px-2 space-y-1">
-          {/* Main Navigation */}
-          <div className="space-y-1">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive(item.href)
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                  onClick={onClose}
-                >
-                  <Icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-gray-200 pt-4">
-            <h3 className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Organization
-            </h3>
-            <div className="mt-2 space-y-1">
-              {organization.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                      isActive(item.href)
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                    onClick={onClose}
-                  >
-                    <Icon className="mr-3 h-5 w-5" />
-                    {item.name}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-gray-200 pt-4">
-            <h3 className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Tools
-            </h3>
-            <div className="mt-2 space-y-1">
-              {tools.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                      isActive(item.href)
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                    onClick={onClose}
-                  >
-                    <Icon className="mr-3 h-5 w-5" />
-                    {item.name}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Logout */}
-          <div className="border-t border-gray-200 pt-4">
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="group flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors"
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Logout
-            </button>
-          </div>
-        </nav>
+        )}
       </div>
+      
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {navigation.map((item) => renderNavItem(item))}
+      </nav>
 
-      {/* Desktop sidebar */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <div className="flex flex-col w-64">
-          <div className="flex flex-col h-0 flex-1 bg-white shadow-lg">
-            <div className="flex items-center h-16 px-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">TodoApp</h2>
-            </div>
-            
-            <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-              {/* Main Navigation */}
-              <div className="space-y-1">
-                {navigation.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                        isActive(item.href)
-                          ? 'bg-primary-100 text-primary-700'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <Icon className="mr-3 h-5 w-5" />
-                      {item.name}
-                    </Link>
-                  );
-                })}
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-gray-200 pt-4">
-                <h3 className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Organization
-                </h3>
-                <div className="mt-2 space-y-1">
-                  {organization.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                          isActive(item.href)
-                            ? 'bg-primary-100 text-primary-700'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
-                      >
-                        <Icon className="mr-3 h-5 w-5" />
-                        {item.name}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-gray-200 pt-4">
-                <h3 className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  Tools
-                </h3>
-                <div className="mt-2 space-y-1">
-                  {tools.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                          isActive(item.href)
-                            ? 'bg-primary-100 text-primary-700'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
-                      >
-                        <Icon className="mr-3 h-5 w-5" />
-                        {item.name}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Logout */}
-              <div className="border-t border-gray-200 pt-4">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="group flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors"
-                >
-                  <LogOut className="mr-3 h-5 w-5" />
-                  Logout
-                </button>
-              </div>
-            </nav>
+      {/* Bottom section with user info and logout */}
+      <div className="border-t border-gray-200 p-4">
+        {/* User profile */}
+        <div className="flex items-center mb-4">
+          <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+            <span className="text-sm font-semibold text-white">
+              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+            </span>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
+            <p className="text-xs text-gray-500">{user?.email}</p>
           </div>
         </div>
+
+        {/* Settings and Logout */}
+        <div className="space-y-1">
+          <Link
+            to={ROUTES.SETTINGS}
+            className="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors"
+            onClick={onClose}
+          >
+            <Settings className="mr-3 h-4 w-4" />
+            Settings
+          </Link>
+          
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
+          >
+            <LogOut className="mr-3 h-4 w-4" />
+            Logout
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

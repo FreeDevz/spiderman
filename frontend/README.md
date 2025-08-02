@@ -13,6 +13,7 @@ Modern React TypeScript frontend application for the TodoApp project, built with
 - **Routing**: React Router for navigation
 - **Testing**: Jest and React Testing Library
 - **Containerization**: Docker/Podman
+- **Layout**: Instagram-style persistent sidebar design
 
 ## Prerequisites
 
@@ -43,18 +44,23 @@ Modern React TypeScript frontend application for the TodoApp project, built with
 
 1. **Build and run with Podman**:
    ```bash
-   # Build frontend image
+   # Build frontend image (consolidated Dockerfile)
    cd frontend && podman build -t todoapp-frontend:latest .
    
    # Run frontend container
-   podman run -d --name todoapp-frontend --network todo-network -p 3000:80 \
-     -e REACT_APP_API_URL=http://localhost:8080/api \
-     todoapp-frontend:latest
+   podman run -d --name todoapp-frontend -p 3000:80 todoapp-frontend:latest
    ```
 
 2. **Access the application**:
    - **Frontend**: http://localhost:3000
-   - **Backend API**: http://localhost:8080/api
+   - **Backend API**: http://localhost:8080/api (configured via nginx proxy)
+
+### Layout Features
+
+- **Instagram-style Persistent Sidebar**: Always visible on desktop (768px+)
+- **Responsive Design**: Mobile hamburger menu for smaller screens
+- **Clean Interface**: No overlay behavior, proper content separation
+- **Modern UI**: White sidebar with gray main content area
 
 ## Project Structure
 
@@ -96,8 +102,8 @@ frontend/
 │   ├── App.tsx            # Main application component
 │   ├── main.tsx           # Application entry point
 │   └── index.css          # Global CSS
-├── Dockerfile             # Container build configuration
-├── nginx.conf             # Nginx configuration for production
+├── Dockerfile             # Multi-stage container build configuration
+├── nginx.conf             # Nginx configuration with backend proxy
 ├── package.json           # Dependencies and scripts
 ├── tsconfig.json          # TypeScript configuration
 ├── tailwind.config.js     # Tailwind CSS configuration
@@ -138,11 +144,13 @@ frontend/
 - Productivity insights and charts
 
 #### UI/UX Features
+- Instagram-style persistent sidebar layout
 - Responsive design for all devices
 - Dark/light theme support
 - Modern, clean interface
 - Loading states and error handling
 - Accessibility features
+- No overlay behavior on desktop
 
 ### 🚧 In Progress Features
 
@@ -158,6 +166,20 @@ frontend/
 - Keyboard shortcuts
 - Auto-save functionality
 - Progressive Web App (PWA) features
+
+## Recent Improvements
+
+### Layout Enhancements (Latest)
+- ✅ **Instagram-style Persistent Sidebar**: Implemented using JavaScript-based responsive detection
+- ✅ **No Overlay Behavior**: Sidebar properly pushes content to the right on desktop
+- ✅ **Mobile Responsive**: Hamburger menu only appears on mobile devices
+- ✅ **Clean Interface**: Removed toggle buttons from desktop view
+
+### Infrastructure Improvements
+- ✅ **Consolidated Dockerfile**: Merged `Dockerfile` and `Dockerfile.prod` into single multi-stage build
+- ✅ **Self-Contained Build**: Application builds from source with no external dependencies
+- ✅ **Production Optimized**: Includes health checks and proper nginx configuration
+- ✅ **Backend Integration**: Nginx proxy configuration for seamless API communication
 
 ## Development
 
