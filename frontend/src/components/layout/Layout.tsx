@@ -27,7 +27,7 @@ const Layout: React.FC = () => {
             style={{
               width: '256px',
               flexShrink: 0,
-              backgroundColor: 'white',
+              backgroundColor: '#f9fafb',
               borderRight: '1px solid #e5e7eb',
               boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
             }}
@@ -45,7 +45,7 @@ const Layout: React.FC = () => {
         )}
 
         {/* Mobile sidebar */}
-        <div className={`md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out shadow-xl ${
+        <div className={`md:hidden fixed inset-y-0 left-0 z-50 w-64 bg-gray-50 border-r border-gray-200 transform transition-transform duration-300 ease-in-out shadow-xl ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}>
           <Sidebar onClose={() => setSidebarOpen(false)} />
