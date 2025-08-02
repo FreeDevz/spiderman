@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../store/hooks';
-import { Plus, Calendar, Clock, AlertTriangle, CheckCircle, TrendingUp, CheckSquare } from 'lucide-react';
+import { Plus, Calendar, Clock, AlertTriangle, CheckCircle, TrendingUp, CheckSquare, ArrowUp } from 'lucide-react';
 import type { RootState } from '../../store';
 import { 
   fetchTasks,
@@ -150,8 +150,10 @@ const DashboardPage: React.FC = () => {
           </div>
           {trend !== undefined && (
             <div className={`flex items-center text-sm font-medium ${trend >= 0 ? 'text-success-600' : 'text-error-600'}`}>
-              <TrendingUp className={`h-4 w-4 mr-1 ${trend < 0 ? 'transform rotate-180' : ''}`} />
-              {Math.abs(trend)}%
+              <div className="mr-4 flex-shrink-0">
+                <ArrowUp className={`h-4 w-4 ${trend < 0 ? 'transform rotate-180' : ''}`} />
+              </div>
+              <span className="flex-shrink-0">{Math.abs(trend)}%</span>
             </div>
           )}
         </div>
