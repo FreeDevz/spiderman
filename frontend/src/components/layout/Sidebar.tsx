@@ -90,15 +90,34 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       {/* Bottom section with user info and logout */}
       <div className="border-t border-gray-200 p-4">
         {/* User profile */}
-        <div className="flex items-center mb-4">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-            <span className="text-sm font-semibold text-white">
+        <div className="flex items-start mb-4">
+          <div 
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+              flexShrink: 0
+            }}
+          >
+            <span 
+              style={{
+                fontSize: '12px',
+                fontWeight: '600',
+                color: 'white',
+                lineHeight: '1'
+              }}
+            >
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </span>
           </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
-            <p className="text-xs text-gray-500">{user?.email}</p>
+          <div className="ml-3 flex flex-col justify-center">
+            <p className="text-sm font-medium text-gray-900 leading-tight">{user?.name || 'User'}</p>
+            <p className="text-xs text-gray-500 leading-tight">{user?.email}</p>
           </div>
         </div>
 
