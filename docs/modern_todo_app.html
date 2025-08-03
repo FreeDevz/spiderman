@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoApp - Modern Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #1f2937;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .logo-section {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-menu {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+            width: 20px;
+        }
+
+        .user-section {
+            position: absolute;
+            bottom: 2rem;
+            left: 1rem;
+            right: 1rem;
+            padding: 16px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .welcome-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .welcome-text h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-text p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .add-task-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .add-task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card.total::before { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .stat-card.completed::before { background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); }
+        .stat-card.pending::before { background: #fbbf24; }
+        .stat-card.overdue::before { background: #ef4444; }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-title {
+            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .stat-icon.total { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+        .stat-icon.completed { background: rgba(74, 222, 128, 0.1); color: #22c55e; }
+        .stat-icon.pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+        .stat-icon.overdue { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            color: #22c55e;
+            font-weight: 500;
+        }
+
+        /* Quick Add Section */
+        .quick-add-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .quick-add-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .quick-add-form {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .quick-add-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .quick-add-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .quick-add-submit {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+        }
+
+        .quick-add-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(74, 222, 128, 0.4);
+        }
+
+        /* Task Sections */
+        .task-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .task-count {
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .quick-add-form {
+                flex-direction: column;
+            }
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-section, .stat-card {
+            animation: slideIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-icon">📋</div>
+                    <span>TodoApp</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span>All Tasks</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span>Today</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">⏰</span>
+                    <span>Upcoming</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">⚠️</span>
+                    <span>Overdue</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">✅</span>
+                    <span>Completed</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">📂</span>
+                    <span>Categories</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Stats</span>
+                </div>
+            </nav>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <div class="user-avatar">TU</div>
+                    <div class="user-details">
+                        <h4>Test User</h4>
+                        <p>test@example.com</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="welcome-section">
+                    <div class="welcome-text">
+                        <h1>Welcome back, Test User! 👋</h1>
+                        <p>Here's what you have planned for today</p>
+                    </div>
+                    <button class="add-task-btn">+ Add Task</button>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card total">
+                        <div class="stat-header">
+                            <span class="stat-title">Total Tasks</span>
+                            <div class="stat-icon total">📋</div>
+                        </div>
+                        <div class="stat-number">12</div>
+                        <div class="stat-change">↗ 5%</div>
+                    </div>
+                    
+                    <div class="stat-card completed">
+                        <div class="stat-header">
+                            <span class="stat-title">Completed</span>
+                            <div class="stat-icon completed">✅</div>
+                        </div>
+                        <div class="stat-number">8</div>
+                        <div class="stat-change">↗ 12%</div>
+                    </div>
+                    
+                    <div class="stat-card pending">
+                        <div class="stat-header">
+                            <span class="stat-title">Pending</span>
+                            <div class="stat-icon pending">⏳</div>
+                        </div>
+                        <div class="stat-number">3</div>
+                        <div class="stat-change">↘ 2%</div>
+                    </div>
+                    
+                    <div class="stat-card overdue">
+                        <div class="stat-header">
+                            <span class="stat-title">Overdue</span>
+                            <div class="stat-icon overdue">⚠️</div>
+                        </div>
+                        <div class="stat-number">1</div>
+                        <div class="stat-change">↘ 50%</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Quick Add Task -->
+            <section class="quick-add-section">
+                <h2 class="quick-add-title">Quick Add Task</h2>
+                <p style="color: #6b7280; margin-bottom: 1rem;">Add a new task quickly without opening the full form</p>
+                <form class="quick-add-form">
+                    <input type="text" class="quick-add-input" placeholder="Enter your task here...">
+                    <button type="submit" class="quick-add-submit">Add Task</button>
+                </form>
+            </section>
+
+            <!-- Today's Tasks -->
+            <section class="task-section">
+                <div class="section-header">
+                    <h2 class="section-title">Today's Tasks</h2>
+                    <span class="task-count">0 tasks</span>
+                </div>
+                <div class="empty-state">
+                    <div class="empty-icon">📅</div>
+                    <div class="empty-title">No tasks for today</div>
+                    <div class="empty-subtitle">Enjoy your free day!</div>
+                </div>
+            </section>
+
+            <!-- Upcoming Tasks -->
+            <section class="task-section">
+                <div class="section-header">
+                    <h2 class="section-title">Upcoming Tasks</h2>
+                    <span class="task-count">0 tasks</span>
+                </div>
+                <div class="empty-state">
+                    <div class="empty-icon">⏰</div>
+                    <div class="empty-title">No upcoming tasks</div>
+                    <div class="empty-subtitle">You're all caught up!</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation item clicks
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Quick add form
+            const quickAddForm = document.querySelector('.quick-add-form');
+            const quickAddInput = document.querySelector('.quick-add-input');
+            
+            quickAddForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (quickAddInput.value.trim()) {
+                    // Simulate adding task
+                    alert('Task added: ' + quickAddInput.value);
+                    quickAddInput.value = '';
+                }
+            });
+
+            // Add task button
+            const addTaskBtn = document.querySelector('.add-task-btn');
+            addTaskBtn.addEventListener('click', function() {
+                alert('Opening full task creation form...');
+            });
+        });
+    </script>
+</body>
+</html>

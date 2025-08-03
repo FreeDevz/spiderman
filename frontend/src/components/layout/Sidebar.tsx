@@ -25,14 +25,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   };
 
   const navigation = [
-    { name: 'Home', href: ROUTES.DASHBOARD, icon: Home },
-    { name: 'All Tasks', href: ROUTES.TASKS, icon: CheckSquare },
-    { name: 'Today', href: `${ROUTES.TASKS}?filter=today`, icon: Calendar },
-    { name: 'Upcoming', href: `${ROUTES.TASKS}?filter=upcoming`, icon: Clock },
-    { name: 'Overdue', href: `${ROUTES.TASKS}?filter=overdue`, icon: AlertTriangle },
-    { name: 'Completed', href: `${ROUTES.TASKS}?filter=completed`, icon: CheckCircle },
-    { name: 'Categories', href: ROUTES.CATEGORIES, icon: FolderOpen },
-    { name: 'Tags', href: ROUTES.TAGS, icon: Tag },
+    { name: 'All Tasks', href: ROUTES.TASKS, icon: CheckSquare, emoji: '📋' },
+    { name: 'Today', href: `${ROUTES.TASKS}?filter=today`, icon: Calendar, emoji: '📅' },
+    { name: 'Upcoming', href: `${ROUTES.TASKS}?filter=upcoming`, icon: Clock, emoji: '⏰' },
+    { name: 'Overdue', href: `${ROUTES.TASKS}?filter=overdue`, icon: AlertTriangle, emoji: '⚠️' },
+    { name: 'Completed', href: `${ROUTES.TASKS}?filter=completed`, icon: CheckCircle, emoji: '✅' },
+    { name: 'Categories', href: ROUTES.CATEGORIES, icon: FolderOpen, emoji: '📂' },
+    { name: 'Stats', href: ROUTES.DASHBOARD, icon: BarChart3, emoji: '📊' },
   ];
 
   const isActive = (href: string) => {
@@ -50,97 +49,61 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       <Link
         key={item.name}
         to={item.href}
-        className={`flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 mb-1 ${
-          active
-            ? 'text-gray-900 bg-gray-100'
-            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-        }`}
+        className={`nav-item ${active ? 'active' : ''}`}
         onClick={onClose}
       >
-        <Icon className={`mr-3 h-5 w-5 ${active ? 'text-gray-900' : 'text-gray-500'}`} />
-        {item.name}
+        <span className="nav-icon">{item.emoji}</span>
+        <span>{item.name}</span>
       </Link>
     );
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full">
       {/* Logo section with mobile close button */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-        <div className="flex items-center space-x-3">
-          <Logo size="sm" />
-          <h2 className="text-lg font-bold text-gray-900">TodoApp</h2>
+      <div className="logo-section">
+        <div className="flex items-center justify-between">
+          <div className="logo">
+            <div className="logo-icon">📋</div>
+            <span>TodoApp</span>
+          </div>
+          {onClose && (
+            <button
+              type="button"
+              className="md:hidden p-2 rounded-md text-white hover:bg-white hover:bg-opacity-20"
+              onClick={onClose}
+            >
+              <X className="h-6 w-6" />
+            </button>
+          )}
         </div>
-        {onClose && (
-          <button
-            type="button"
-            className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-            onClick={onClose}
-          >
-            <X className="h-6 w-6" />
-          </button>
-        )}
       </div>
       
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="nav-menu flex-1">
         {navigation.map((item) => renderNavItem(item))}
       </nav>
 
       {/* Bottom section with user info and logout */}
-      <div className="border-t border-gray-200 p-4">
-        {/* User profile */}
-        <div className="flex items-start mb-4">
-          <div 
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-              flexShrink: 0
-            }}
-          >
-            <span 
-              style={{
-                fontSize: '12px',
-                fontWeight: '600',
-                color: 'white',
-                lineHeight: '1'
-              }}
-            >
-              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-            </span>
+      <div className="user-section">
+        <div className="user-info">
+          <div className="user-avatar">
+            {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
           </div>
-          <div className="ml-3 flex flex-col justify-center">
-            <p className="text-sm font-medium text-gray-900 leading-tight">{user?.name || 'User'}</p>
-            <p className="text-xs text-gray-500 leading-tight">{user?.email}</p>
+          <div className="user-details">
+            <h4>{user?.name || 'User'}</h4>
+            <p>{user?.email || 'user@example.com'}</p>
           </div>
         </div>
-
-        {/* Settings and Logout */}
-        <div className="space-y-1">
-          <Link
-            to={ROUTES.SETTINGS}
-            className="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors"
-            onClick={onClose}
-          >
-            <Settings className="mr-3 h-4 w-4" />
-            Settings
-          </Link>
-          
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
-          >
-            <LogOut className="mr-3 h-4 w-4" />
-            Logout
-          </button>
-        </div>
+        
+        {/* Logout button */}
+        <button
+          onClick={handleLogout}
+          className="w-full mt-3 p-2 text-left text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-all duration-200 flex items-center gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="text-sm">Logout</span>
+        </button>
       </div>
     </div>
   );
